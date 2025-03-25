@@ -17,7 +17,13 @@
     "commands": [
       {
         "command": "principium-snippets.openWebview",
+        "category": "Principium Snippets",
         "title": "$(notebook-mimetype) Code Snippet Manager"
+      },
+      {
+        "command": "principium-snippets.refresh",
+        "category": "Principium Snippets",
+        "title": "Refresh"
       }
     ]
   },

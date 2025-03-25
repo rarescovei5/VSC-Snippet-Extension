@@ -19,15 +19,18 @@ export function activate(context: vscode.ExtensionContext) {
       SnippetPanel.createOrShow(context.extensionUri);
     })
   );
+  context.subscriptions.push(
+    vscode.commands.registerCommand('principium-snippets.refresh', () => {
+      SnippetPanel.kill();
+      SnippetPanel.createOrShow(context.extensionUri);
+    })
+  );
   context.subscriptions.push(sBarButton);
 }
 export function deactivate() {}
 //  ------------------------- Webview --------------------------
 
 class SnippetPanel {
-  /**
-   * Track the currently panel. Only allow a single panel to exist at a time.
-   */
   public static currentPanel: SnippetPanel | undefined;
 
   public static readonly viewType = 'snippetManager';
@@ -40,8 +43,17 @@ class SnippetPanel {
     this._panel = panel;
     this._extensionUri = extensionUri;
 
-    // Set the webview's initial html content
-    this._panel.webview.html = this._getHtmlForWebview(this._panel.webview);
+    // Set the webview's html content
+    const loadHtml = async () => {
+      this._panel.webview.html = await this._getHtml();
+    };
+    loadHtml();
+
+    this._panel.iconPath = vscode.Uri.joinPath(
+      this._extensionUri,
+      'media',
+      'code.svg'
+    );
 
     // Listen for when the panel is disposed
     // This happens when the user closes the panel or when the panel is closed programmatically
@@ -83,14 +95,48 @@ class SnippetPanel {
     SnippetPanel.currentPanel = new SnippetPanel(panel, extensionUri);
   }
 
-  public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
-    SnippetPanel.currentPanel = new SnippetPanel(panel, extensionUri);
-  }
+  private async _getHtml(): Promise<string> {
+    const webview = this._panel.webview;
+    const htmlUri = vscode.Uri.joinPath(
+      this._extensionUri,
+      'media',
+      'index.html'
+    );
 
-  public doRefactor() {
-    // Send a message to the webview webview.
-    // You can send any JSON serializable data.
-    this._panel.webview.postMessage({ command: 'refactor' });
+    try {
+      let html = (await vscode.workspace.fs.readFile(htmlUri)).toString();
+
+      // Uris
+      const scriptUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js')
+      );
+      const stylesResetUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(this._extensionUri, 'media', 'reset.css')
+      );
+      const stylesMainUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(this._extensionUri, 'media', 'vscode.css')
+      );
+      const stylesUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(this._extensionUri, 'media', 'styles.css')
+      );
+
+      // Use a nonce to only allow specific scripts to be run
+      const nonce = getNonce();
+
+      // Replace placeholders in HTML file
+      html = html
+        .replace(/\${scriptUri}/g, scriptUri.toString())
+        .replace(/\${stylesResetUri}/g, stylesResetUri.toString())
+        .replace(/\${stylesMainUri}/g, stylesMainUri.toString())
+        .replace(/\${stylesUri}/g, stylesUri.toString())
+        .replace(/\${nonce}/g, nonce)
+        .replace(/\${webview.cspSource}/g, webview.cspSource);
+
+      return html;
+    } catch (error) {
+      console.error('Error reading HTML file:', error);
+      return `<h1>Error loading webview</h1>`;
+    }
   }
 
   public dispose() {
@@ -106,44 +152,9 @@ class SnippetPanel {
       }
     }
   }
-
-  private _getHtmlForWebview(webview: vscode.Webview) {
-    // Uris
-    const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js')
-    );
-    const stylesResetUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, 'media', 'reset.css')
-    );
-    const stylesMainUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, 'media', 'vscode.css')
-    );
-
-    // Use a nonce to only allow specific scripts to be run
-    const nonce = getNonce();
-
-    return `<!DOCTYPE html>
-			<html lang="en">
-				<head>
-					<meta charset="UTF-8">
-					<!--
-						Use a content security policy to only allow loading images from https or from our extension directory,
-						and only allow scripts that have a specific nonce.
-					-->
-					<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; img-src ${webview.cspSource} https:; script-src 'nonce-${nonce}';">
-
-					<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-					<link href="${stylesResetUri}" rel="stylesheet">
-					<link href="${stylesMainUri}" rel="stylesheet">
-
-					<title>Snipet Manager</title>
-				</head>
-				<body>
-					
-					<script nonce="${nonce}" src="${scriptUri}"></script>
-				</body>
-			</html>`;
+  public static kill() {
+    SnippetPanel.currentPanel?.dispose();
+    SnippetPanel.currentPanel = undefined;
   }
 }
 //  -------------------- Utility Functions ---------------------
