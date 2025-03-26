@@ -87,7 +87,7 @@ class SnippetPanel {
     // Otherwise, create a new panel.
     const panel = vscode.window.createWebviewPanel(
       SnippetPanel.viewType,
-      'Snippet Manager',
+      'Code Snippets',
       column || vscode.ViewColumn.One,
       getWebviewOptions(extensionUri)
     );
@@ -110,12 +110,6 @@ class SnippetPanel {
       const scriptUri = webview.asWebviewUri(
         vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js')
       );
-      const stylesResetUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(this._extensionUri, 'media', 'reset.css')
-      );
-      const stylesMainUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(this._extensionUri, 'media', 'vscode.css')
-      );
       const stylesUri = webview.asWebviewUri(
         vscode.Uri.joinPath(this._extensionUri, 'media', 'styles.css')
       );
@@ -125,12 +119,10 @@ class SnippetPanel {
 
       // Replace placeholders in HTML file
       html = html
-        .replace(/\${scriptUri}/g, scriptUri.toString())
-        .replace(/\${stylesResetUri}/g, stylesResetUri.toString())
-        .replace(/\${stylesMainUri}/g, stylesMainUri.toString())
-        .replace(/\${stylesUri}/g, stylesUri.toString())
+        .replace(/\${webview.cspSource}/g, webview.cspSource)
         .replace(/\${nonce}/g, nonce)
-        .replace(/\${webview.cspSource}/g, webview.cspSource);
+        .replace(/\${stylesUri}/g, stylesUri.toString())
+        .replace(/\${scriptUri}/g, scriptUri.toString());
 
       return html;
     } catch (error) {

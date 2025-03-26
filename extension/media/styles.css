@@ -1,0 +1,92 @@
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Utility -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  list-style: none;
+
+  font-family: var(--vscode-font-family);
+  font-weight: var(--vscode-font-weight);
+  color: var(--vscode-foreground);
+}
+.btn {
+  background: transparent;
+
+  padding: 10px;
+  border-radius: var(--vscode-button-border-radius);
+  border-radius: 5px;
+
+  font-size: 16px;
+
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.btn-w-icon {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+.btn.active {
+  background: #ffffff0d;
+  border: 1px solid var(--vscode-editorWidget-border);
+}
+/* "Tailwind" ahh classes */
+.bg-transparent,
+.btn.bg-transparent {
+  background: transparent;
+}
+.w-full {
+  width: 100%;
+}
+.text-center {
+  text-align: center;
+}
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Main Layout -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+body {
+  height: 100svh;
+
+  display: flex;
+  flex-direction: row;
+
+  padding: 0px;
+}
+aside {
+  height: 100%;
+  flex-basis: 25%;
+
+  display: flex;
+  flex-direction: column;
+
+  border-right: 1px solid var(--vscode-editorWidget-border);
+}
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Siderbar -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+.sidebar-top {
+  padding: 20px;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+
+  border-bottom: 1px solid var(--vscode-editorWidget-border);
+}
+.sidebar-top > h1 {
+  font-size: 20px;
+}
+.sidebar-middle {
+  flex: 1;
+
+  padding: 20px 10px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  border-bottom: 1px solid var(--vscode-editorWidget-border);
+}
+.sidebar-bottom {
+  padding: 10px 10px;
+}
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-   Main   -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
