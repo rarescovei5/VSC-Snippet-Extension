@@ -14,7 +14,6 @@
   background: transparent;
 
   padding: 10px;
-  border-radius: var(--vscode-button-border-radius);
   border-radius: 5px;
 
   font-size: 16px;
@@ -61,7 +60,11 @@ aside {
 
   border-right: 1px solid var(--vscode-editorWidget-border);
 }
-/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Siderbar -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+main {
+  flex: 1;
+  height: 100%;
+}
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Sidebar -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 .sidebar-top {
   padding: 20px;
 
@@ -89,4 +92,37 @@ aside {
 .sidebar-bottom {
   padding: 10px 10px;
 }
-/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-   Main   -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-   Main   -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Snippets Page -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+#snippetsTop-search,
+#snippetsMiddle-displayWay {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  gap: 10px;
+
+  border-bottom: 1px solid var(--vscode-editorWidget-border);
+}
+#snippetsTop-search > input {
+  background: transparent;
+  border: 1px solid var(--vscode-editorWidget-border);
+
+  border-radius: 5px;
+
+  font-size: 16px;
+
+  padding: 10px 20px;
+  flex: 1;
+}
+#selected-language-btn {
+  padding: 10px;
+  border-radius: 5px;
+
+  background: #ffffff0d;
+  border: 1px solid var(--vscode-editorWidget-border);
+
+  font-size: 16px;
+
+  cursor: pointer;
+}
