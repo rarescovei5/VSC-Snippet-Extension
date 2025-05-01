@@ -113,6 +113,17 @@ class SnippetPanel {
       const stylesUri = webview.asWebviewUri(
         vscode.Uri.joinPath(this._extensionUri, 'media', 'styles.css')
       );
+      const highlightJsUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(this._extensionUri, 'media', 'highlight.min.js')
+      );
+
+      const highlightCssUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(
+          this._extensionUri,
+          'media',
+          'atom-one-dark.min.css'
+        )
+      );
 
       // Use a nonce to only allow specific scripts to be run
       const nonce = getNonce();
@@ -121,6 +132,8 @@ class SnippetPanel {
       html = html
         .replace(/\${webview.cspSource}/g, webview.cspSource)
         .replace(/\${nonce}/g, nonce)
+        .replace(/\${highlightCssUri}/g, highlightCssUri.toString())
+        .replace(/\${highlightJsUri}/g, highlightJsUri.toString())
         .replace(/\${stylesUri}/g, stylesUri.toString())
         .replace(/\${scriptUri}/g, scriptUri.toString());
 
