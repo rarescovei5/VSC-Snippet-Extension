@@ -1,4 +1,3 @@
-INDEX.HTML
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -78,7 +77,22 @@ INDEX.HTML
         </button>
       </div>
     </aside>
-    <main></main>
+    <main>
+      <div id="snippets-page">
+        <div id="snippetsTop-search">
+          <input type="text" placeholder="Search Snippets..." />
+          <div>
+            <button id="selected-language-btn">All Languages</button>
+          </div>
+        </div>
+        <div id="snippetsMiddle-displayWay">
+          <button class="btn active" id="gridView-btn">Grid View</button>
+          <button class="btn" id="listView-btn">List View</button>
+        </div>
+        <div id="snippets-container"></div>
+      </div>
+      <div id="settings-page"></div>
+    </main>
     <script nonce="${nonce}" src="${scriptUri}"></script>
   </body>
 </html>
