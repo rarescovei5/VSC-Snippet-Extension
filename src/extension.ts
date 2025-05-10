@@ -27,7 +27,9 @@ export function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(sBarButton);
 }
-export function deactivate() {}
+export function deactivate() {
+  SnippetPanel.kill();
+}
 //  ------------------------- Webview --------------------------
 
 class SnippetPanel {
@@ -158,6 +160,7 @@ class SnippetPanel {
     }
   }
   public static kill() {
+    SnippetPanel.currentPanel?._panel.webview.postMessage({ type: 'shutdown' });
     SnippetPanel.currentPanel?.dispose();
     SnippetPanel.currentPanel = undefined;
   }

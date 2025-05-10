@@ -74,6 +74,7 @@
           </svg>
           Snippets
         </button>
+        <div id="folder-buttons-container"></div>
       </div>
       <div class="sidebar-bottom">
         <button class="btn active bg-transparent w-full" id="new-folder-btn">
@@ -83,17 +84,17 @@
     </aside>
     <main>
       <div id="snippets-page">
-        <div id="snippetsTop-search">
+        <div class="snippetsTop-search">
           <input
             type="text"
             placeholder="Search Snippets..."
-            id="snippets-searchInput"
+            class="snippets-searchInput"
           />
           <div>
-            <button id="selected-language-btn">All Languages</button>
+            <button class="selected-language-btn">All Languages</button>
           </div>
         </div>
-        <div id="snippetsMiddle-displayWay">
+        <div class="snippetsMiddle-displayWay">
           <button class="btn active" id="gridView-btn">Grid View</button>
           <button class="btn" id="listView-btn">List View</button>
         </div>
