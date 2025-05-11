@@ -86,8 +86,16 @@ class SnippetApp {
       this.createFolderButton(folderId);
     }
 
-    this.addClickListener(DOM_IDS.settingsButton, this.handlePageNavigation);
-    this.addClickListener(DOM_IDS.snippetsButton, this.handlePageNavigation);
+    this.addClickListener(DOM_IDS.settingsButton, (e) => {
+      this.handlePageNavigation(
+        document.getElementById(DOM_IDS.settingsButton)
+      );
+    });
+    this.addClickListener(DOM_IDS.snippetsButton, (e) => {
+      this.handlePageNavigation(
+        document.getElementById(DOM_IDS.snippetsButton)
+      );
+    });
     this.addClickListener(DOM_IDS.gridViewButton, this.handleViewToggle);
     this.addClickListener(DOM_IDS.listViewButton, this.handleViewToggle);
     document
@@ -143,34 +151,112 @@ class SnippetApp {
       folder.snippets.push(snippetId);
     }
   }
+  deleteFolder(folderId) {
+    const tempFolders = {};
+
+    const deletedId = parseInt(folderId);
+
+    // Copy and shift folders
+    for (const id in this.folders) {
+      const currentId = parseInt(id);
+      if (currentId < deletedId) {
+        tempFolders[currentId] = this.folders[id];
+      } else if (currentId > deletedId) {
+        tempFolders[currentId - 1] = this.folders[id];
+      }
+    }
+
+    this.folders = tempFolders;
+
+    this.pageState.activeButton = document.getElementById(
+      DOM_IDS.snippetsButton
+    );
+    document.getElementById(DOM_IDS.folderButtonsContainer).innerHTML = '';
+
+    for (const id in this.folders) {
+      this.createFolderButton(id);
+    }
+  }
 
   createFolderButton(folderId) {
     const container = document.getElementById(DOM_IDS.folderButtonsContainer);
     const folderIndex = folderId ?? container.childNodes.length + 1;
+    const folderData = this.folders[folderId] || {
+      folderName: `Folder ${folderIndex}`,
+      snippets: [],
+    };
 
     const button = document.createElement('button');
-    button.style.position = 'relative';
-    const folderName = folderId
-      ? `${this.folders[folderId].folderName}`
-      : `Folder ${folderIndex}`;
-
-    const folderIconSVG = `
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="var(--vscode-foreground)" xmlns="http://www.w3.org/2000/svg">
-        <path d="M14.5 3H7.71l-.85-.85L6.51 2h-5l-.5.5v11l.5.5h13l.5-.5v-10L14.5 3zm-.51 8.49V13h-12V7h4.49l.35-.15.86-.86H14v1.5l-.01 4zm0-6.49h-6.5l-.35.15-.86.86H2v-3h4.29l.85.85.36.15H14l-.01.99z"/>
-      </svg>
-      `;
-    const closeIconSVG = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 16 16" fill="none">
-    <path fill-rule="evenodd" clip-rule="evenodd" d="M7.11641 7.99992L2.55835 12.558L3.44223 13.4419L8.00029 8.88381L12.5583 13.4419L13.4422 12.558L8.88417 7.99992L13.4422 3.44187L12.5583 2.55798L8.00029 7.11604L3.44223 2.55798L2.55835 3.44187L7.11641 7.99992Z" fill="var(--vscode-foreground)"/>
-    </svg>`;
-
-    button.innerHTML = `${folderIconSVG}${folderName}<div class="delete-folder-btn">${closeIconSVG}</div>`;
-    button.className = 'btn btn-w-icon w-full folder-btn';
+    button.className = 'btn w-full folder-btn';
     button.setAttribute('data-folderid', folderIndex);
     button.id = DOM_IDS.snippetsButton;
-    button.addEventListener('click', this.handlePageNavigation);
 
-    // Logic for dragging snippets into folders
+    const folderIconSVG = `
+    <svg width="16"  height="16" viewBox="0 0 16 16" fill="var(--vscode-foreground)" xmlns="http://www.w3.org/2000/svg">
+      <path d="M14.5 3H7.71l-.85-.85L6.51 2h-5l-.5.5v11l.5.5h13l.5-.5v-10L14.5 3zm-.51 8.49V13h-12V7h4.49l.35-.15.86-.86H14v1.5l-.01 4zm0-6.49h-6.5l-.35.15-.86.86H2v-3h4.29l.85.85.36.15H14l-.01.99z"/>
+    </svg>`;
+
+    const closeIconSVG = ` 
+    <svg xmlns="http://www.w3.org/2000/svg"  width="12" height="12" viewBox="0 0 16 16" fill="none">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M7.11641 7.99992L2.55835 12.558L3.44223 13.4419L8.00029 8.88381L12.5583 13.4419L13.4422 12.558L8.88417 7.99992L13.4422 3.44187L12.5583 2.55798L8.00029 7.11604L3.44223 2.55798L2.55835 3.44187L7.11641 7.99992Z" fill="var(--vscode-foreground)"/>
+    </svg>`;
+
+    // Editable Title Element
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = folderData.folderName;
+    titleSpan.contentEditable = false;
+    titleSpan.className = 'folder-title';
+    titleSpan.style.marginInline = '5px';
+    titleSpan.style.outline = 'none';
+    titleSpan.style.cursor = 'pointer';
+    titleSpan.style.wordBreak = 'break-all';
+
+    titleSpan.addEventListener('click', (e) => {
+      if (button.classList.contains('active')) {
+        e.stopPropagation();
+        titleSpan.contentEditable = true;
+        titleSpan.focus();
+      }
+    });
+
+    titleSpan.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        titleSpan.blur();
+      }
+    });
+
+    titleSpan.addEventListener('blur', () => {
+      const newTitle = titleSpan.textContent.trim();
+      if (newTitle.length > 0) {
+        folderData.folderName = newTitle;
+        this.folders[folderIndex] = folderData;
+      } else {
+        titleSpan.textContent = folderData.folderName;
+      }
+      titleSpan.contentEditable = false;
+    });
+
+    const deleteBtn = document.createElement('div');
+    deleteBtn.className = 'delete-folder-btn';
+    deleteBtn.innerHTML = closeIconSVG;
+    deleteBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.deleteFolder(folderIndex);
+    });
+
+    const iconWrapper = document.createElement('span');
+    iconWrapper.innerHTML = folderIconSVG;
+
+    button.appendChild(iconWrapper);
+    button.appendChild(titleSpan);
+    button.appendChild(deleteBtn);
+
+    button.addEventListener('click', (e) => {
+      this.handlePageNavigation(button);
+    });
+
+    // Drag and drop handlers
     button.addEventListener('dragover', (e) => {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
@@ -180,12 +266,12 @@ class SnippetApp {
       e.preventDefault();
       const snippetId = e.dataTransfer.getData('text/plain');
       if (!snippetId) return;
-
-      this.addSnippetToFolder(folderId, snippetId);
+      this.addSnippetToFolder(folderIndex, snippetId);
     });
 
-    if (!folderId) {
-      this.folders[folderIndex] = { folderName, snippets: [] };
+    // Create folder in data if it doesn't exist
+    if (!this.folders[folderIndex]) {
+      this.folders[folderIndex] = folderData;
     }
 
     container.appendChild(button);
@@ -240,8 +326,8 @@ class SnippetApp {
     }
   }
 
-  handlePageNavigation(e) {
-    this.pageState.activeButton = e.target;
+  handlePageNavigation(button) {
+    this.pageState.activeButton = button;
   }
 
   handleViewToggle(e) {

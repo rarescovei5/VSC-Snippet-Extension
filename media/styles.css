@@ -100,14 +100,23 @@ main {
 .sidebar-bottom {
   padding: 10px 10px;
 }
+.folder-btn {
+  display: flex;
+  align-items: center;
+}
+.folder-btn > span {
+  display: flex;
+}
+.folder-btn.active > .delete-folder-btn {
+  display: flex;
+}
 .delete-folder-btn {
   display: none;
-  position: absolute;
-  right: 5px;
+  margin-left: auto;
+
   width: 16px;
   height: 16px;
-  top: 50%;
-  transform: translateY(-50%);
+
   align-items: center;
   justify-content: center;
   border-radius: 5px;
@@ -115,9 +124,7 @@ main {
 .delete-folder-btn:hover {
   background: var(--vscode-editorWidget-border);
 }
-.folder-btn.active > .delete-folder-btn {
-  display: flex;
-}
+
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-   Main   -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Snippets Page -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
