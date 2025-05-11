@@ -149,7 +149,6 @@ main {
   display: block;
 
   columns: 350px;
-  align-items: flex-start;
 }
 
 /* Snippet Card Grid */
@@ -165,6 +164,7 @@ main {
   page-break-inside: avoid; /* legacy */
   -webkit-column-break-inside: avoid; /* old WebKit */
   -moz-column-break-inside: avoid; /* old Firefox */
+  margin-bottom: 10px;
 }
 .snippet-card > small {
   position: absolute;
@@ -207,7 +207,6 @@ main {
 }
 /* Snippet Card List */
 .snippet-card-row {
-  flex: 1;
   padding: 10px;
   border-radius: 5px;
   background: #ffffff0d;

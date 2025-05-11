@@ -1,3 +1,8 @@
+/** TODO: Implement Searching by title and filtering by language on both snippet page and folder page
+ *  Implement Infinite Scroll
+ *  Add something to settings page
+ * */
+
 class SnippetApp {
   constructor(vscApi) {
     this.API_URL = 'http://localhost:3000/api/v1/snippets';
@@ -15,16 +20,23 @@ class SnippetApp {
       currentPage: 1,
       snippets: [],
     };
+
+    this.searchParams = {
+      title: '',
+      language: '',
+    };
+    this.debounceTimer = null;
   }
 
   isInFolder() {
-    return !Boolean(this.pageState.activeButton?.dataset.folderid);
+    return Boolean(this.pageState.activeButton?.dataset.folderid);
   }
 
   bindContextMethods() {
     this.handlePageNavigation = this.handlePageNavigation.bind(this);
     this.handleViewToggle = this.handleViewToggle.bind(this);
     this.createFolderButton = this.createFolderButton.bind(this);
+    this.handleSearch = this.handleSearch.bind(this);
   }
 
   createPageStateProxy() {
@@ -44,6 +56,20 @@ class SnippetApp {
     );
   }
 
+  handleSearch(e) {
+    if (this.isInFolder()) {
+    } else {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(() => {
+        this.searchParams.title = e.target.value;
+
+        this.currentSnippetsView = { currentPage: 1, snippets: [] };
+        document.getElementById(DOM_IDS.snippetsContainer).innerHTML = '';
+        this.loadSnippets();
+      }, 500);
+    }
+  }
+
   init() {
     for (const folderId in this.folders) {
       this.createFolderButton(folderId);
@@ -53,6 +79,9 @@ class SnippetApp {
     this.addClickListener(DOM_IDS.snippetsButton, this.handlePageNavigation);
     this.addClickListener(DOM_IDS.gridViewButton, this.handleViewToggle);
     this.addClickListener(DOM_IDS.listViewButton, this.handleViewToggle);
+    document
+      .getElementById('snippets-searchInput')
+      .addEventListener('input', this.handleSearch);
     this.addClickListener(DOM_IDS.newFolderButton, () => {
       this.createFolderButton();
     });
@@ -112,7 +141,6 @@ class SnippetApp {
       const snippetId = e.dataTransfer.getData('text/plain');
       if (!snippetId) return;
 
-      // Example: Add the snippet ID to the folder's array
       this.addSnippetToFolder(folderId, snippetId);
     });
 
@@ -132,7 +160,9 @@ class SnippetApp {
     } else {
       this.currentSnippetsView.snippets.push(
         ...(await this.fetchDiscoverSnippets(
-          this.currentSnippetsView.currentPage
+          this.currentSnippetsView.currentPage,
+          this.searchParams.title,
+          this.searchParams.language
         ))
       );
     }
@@ -188,10 +218,8 @@ class SnippetApp {
 
     const container = document.getElementById(DOM_IDS.snippetsContainer);
     if (isGrid) {
-      container.style.display = 'block';
       container.style.columns = '350px';
     } else {
-      container.style.display = 'flex';
       container.style.columns = 'unset';
     }
     this.activeViewType = isGrid ? 'grid' : 'list';
@@ -206,8 +234,8 @@ class SnippetApp {
       const params = new URLSearchParams({
         page,
         limit: 16,
-        ...(searchQuery && { title: searchQuery }),
-        ...(language && { language }),
+        ...(searchQuery.length > 0 && { title: searchQuery }),
+        ...(language.length > 0 && { language }),
       });
       const response = await fetch(`${this.API_URL}/discover?${params}`);
       const json = await response.json();
@@ -245,8 +273,16 @@ class SnippetApp {
       }
     }
 
-    container.append(...snippetNodes);
-    hljs.highlightAll();
+    if (this.activeViewType === 'list') {
+      const flexDiv = document.createElement('div');
+      flexDiv.style =
+        'display:flex; flex-direction:column; gap:10px; height: 100%; width:100%; min-height:0px;';
+      flexDiv.append(...snippetNodes);
+      container.append(flexDiv);
+    } else {
+      container.append(...snippetNodes);
+      hljs.highlightAll();
+    }
   }
 
   getSnippetCardComponent(snippet) {
@@ -260,7 +296,9 @@ class SnippetApp {
             <p>${snippet.description}</p>
           </div>
           <pre class="snippet-card-code-container">
-            <code class="language-${snippet.language}">${snippet.code}</code>
+            <code class="language-${snippet.language}">${escapeHtml(
+      snippet.code
+    )}</code>
           </pre>
           <div class="snippet-card-buttons">
             <button class='copy-snippet-btn'>Copy</button>
@@ -273,7 +311,7 @@ class SnippetApp {
         navigator.clipboard.writeText(snippet.code);
       });
 
-    if (this.isInFolder()) {
+    if (!this.isInFolder()) {
       snippetNode.setAttribute('draggable', 'true');
       snippetNode.addEventListener('dragstart', (e) => {
         e.dataTransfer.setData('text/plain', snippet.id);
@@ -303,7 +341,7 @@ class SnippetApp {
         navigator.clipboard.writeText(snippet.code);
       });
 
-    if (this.isInFolder()) {
+    if (!this.isInFolder()) {
       snippetNode.setAttribute('draggable', 'true');
       snippetNode.addEventListener('dragstart', (e) => {
         e.dataTransfer.setData('text/plain', snippet.id);
@@ -327,7 +365,14 @@ const DOM_IDS = {
   newFolderButton: 'new-folder-btn',
   snippetsContainer: 'snippets-container',
 };
-
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 (async function () {
   const vscode = acquireVsCodeApi();
   const app = new SnippetApp(vscode);
