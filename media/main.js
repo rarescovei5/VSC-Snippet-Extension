@@ -1,5 +1,4 @@
-/** Implement Infinite Scroll
- *  Add something to settings page
+/** Add something to settings page
  * */
 
 class SnippetApp {
@@ -25,6 +24,7 @@ class SnippetApp {
       language: '',
     };
     this.debounceTimer = null;
+    this.noMoreSnippets = false;
   }
 
   isInFolder() {
@@ -56,6 +56,7 @@ class SnippetApp {
   }
 
   handleSearch(e) {
+    this.noMoreSnippets = false;
     if (this.isInFolder()) {
       const title = e.target.value.toLowerCase();
       this.searchParams.title = title;
@@ -107,8 +108,9 @@ class SnippetApp {
     document
       .getElementById('select-language')
       .addEventListener('change', (e) => {
+        this.noMoreSnippets = false;
         this.searchParams.language = e.target.value;
-        console.log('ceva');
+
         if (this.isInFolder()) {
           const filtered = this.currentSnippetsView.snippets.filter(
             (snippet) => {
@@ -127,6 +129,30 @@ class SnippetApp {
           this.loadSnippets();
         }
       });
+    let isLoading = false;
+    const snippetsContainer = document.getElementById(
+      DOM_IDS.snippetsContainer
+    );
+    snippetsContainer.addEventListener('scroll', (e) => {
+      if (this.isInFolder()) return;
+
+      // if we’re already fetching, do nothing
+      if (isLoading || this.noMoreSnippets) return;
+
+      // have we scrolled to within 10px of the bottom?
+      if (
+        snippetsContainer.scrollTop + snippetsContainer.clientHeight >=
+        snippetsContainer.scrollHeight - 10
+      ) {
+        isLoading = true;
+        // loadSnippets will append the next page into currentSnippetsView.snippets
+        this.loadSnippets()
+          .catch(console.error)
+          .finally(() => {
+            isLoading = false;
+          });
+      }
+    });
 
     this.loadSnippets();
 
@@ -279,18 +305,17 @@ class SnippetApp {
 
   async loadSnippets() {
     const folderId = this.pageState.activeButton?.dataset.folderid;
+    let newSnippets;
     if (folderId) {
-      this.currentSnippetsView.snippets = await this.fetchFolderSnippets(
-        folderId
-      );
+      newSnippets = await this.fetchFolderSnippets(folderId);
+      this.currentSnippetsView.snippets = newSnippets;
     } else {
-      this.currentSnippetsView.snippets.push(
-        ...(await this.fetchDiscoverSnippets(
-          this.currentSnippetsView.currentPage,
-          this.searchParams.title,
-          this.searchParams.language
-        ))
+      newSnippets = await this.fetchDiscoverSnippets(
+        this.currentSnippetsView.currentPage,
+        this.searchParams.title,
+        this.searchParams.language
       );
+      this.currentSnippetsView.snippets.push(...newSnippets);
     }
 
     const lastSnippet =
@@ -303,7 +328,12 @@ class SnippetApp {
       return;
     }
 
-    this.renderSnippets(this.currentSnippetsView.snippets);
+    if (newSnippets.length === 0) {
+      this.noMoreSnippets = true;
+      return;
+    }
+
+    this.renderSnippets(newSnippets);
   }
 
   updateVisibleSection() {
@@ -352,14 +382,14 @@ class SnippetApp {
 
     document.getElementById(DOM_IDS.snippetsContainer).innerHTML = '';
 
-    this.loadSnippets();
+    this.renderSnippets(this.currentSnippetsView.snippets);
   }
 
   async fetchDiscoverSnippets(page, searchQuery, language) {
     try {
       const params = new URLSearchParams({
         page,
-        limit: 16,
+        limit: 30,
         ...(searchQuery.length > 0 && { title: searchQuery }),
         ...(language.length > 0 && { language }),
       });
