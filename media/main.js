@@ -192,7 +192,7 @@ class SnippetApp {
       container.style.columns = '350px';
     } else {
       container.style.display = 'flex';
-      container.style.display = 'unset';
+      container.style.columns = 'unset';
     }
     this.activeViewType = isGrid ? 'grid' : 'list';
 
@@ -289,15 +289,31 @@ class SnippetApp {
   }
   getSnippetRowComponent(snippet) {
     const snippetNode = document.createElement('div');
-    snippetNode.className = `snippet-card-wrapper`;
+    snippetNode.className = `snippet-card-row`;
     snippetNode.innerHTML = `
-    <div class='snippet-card-row'>
-    </div>`;
-    // snippetNode
-    //   .querySelector('.copy-snippet-btn')
-    //   .addEventListener('click', (e) => {
-    //     navigator.clipboard.writeText(snippet.code);
-    //   });
+    <div class='snippet-card-row-info'>
+      <h3>${snippet.title}</h3>
+      <small>${snippet.language}</small>
+    </div>
+    <button class='copy-snippet-btn'>Copy</button>
+    `;
+    snippetNode
+      .querySelector('.copy-snippet-btn')
+      .addEventListener('click', (e) => {
+        navigator.clipboard.writeText(snippet.code);
+      });
+
+    if (this.isInFolder()) {
+      snippetNode.setAttribute('draggable', 'true');
+      snippetNode.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', snippet.id);
+        e.dataTransfer.effectAllowed = 'move';
+        snippetNode.classList.add('dragging');
+      });
+      snippetNode.addEventListener('dragend', () => {
+        snippetNode.classList.remove('dragging');
+      });
+    }
     return snippetNode;
   }
 }

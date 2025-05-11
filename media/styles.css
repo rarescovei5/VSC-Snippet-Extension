@@ -117,7 +117,7 @@ main {
 
   border-bottom: 1px solid var(--vscode-editorWidget-border);
 }
-.snippets-searchInput {
+#snippets-searchInput {
   background: transparent;
   border: 1px solid var(--vscode-editorWidget-border);
 
@@ -128,7 +128,7 @@ main {
   padding: 10px 20px;
   flex: 1;
 }
-.selected-language-btn {
+#selected-language-btn {
   padding: 10px;
   border-radius: 5px;
 
@@ -146,13 +146,13 @@ main {
   height: 100%;
   overflow-y: auto;
 
-  display: block; /* Ensures column behavior + height works */
-  box-sizing: border-box;
+  display: block;
 
   columns: 350px;
+  align-items: flex-start;
 }
 
-/* Snippet Card */
+/* Snippet Card Grid */
 .snippet-card {
   position: relative;
   padding: 10px;
@@ -183,7 +183,8 @@ main {
   border-radius: 5px;
 }
 
-.snippet-card-buttons > button {
+.snippet-card-buttons > button,
+.snippet-card-row > button {
   padding: 5px 10px;
   border-radius: 5px;
 
@@ -194,7 +195,8 @@ main {
 
   cursor: pointer;
 }
-.snippet-card-buttons > button:hover {
+.snippet-card-buttons > button:hover,
+.snippet-card-row > button:hover {
   background: var(--vscode-editorWidget-border);
 }
 .snippet-card-info {
@@ -203,12 +205,31 @@ main {
 .snippet-card-info > h3 {
   margin-bottom: 10px;
 }
+/* Snippet Card List */
+.snippet-card-row {
+  flex: 1;
+  padding: 10px;
+  border-radius: 5px;
+  background: #ffffff0d;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.snippet-card-row-info {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+
+  flex-basis: 70%;
+}
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Settings Page -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 #settings-page {
   display: none;
 }
 
-.dragging > .snippet-card {
+.dragging > .snippet-card,
+.dragging.snippet-card-row {
   opacity: 50%;
 }
