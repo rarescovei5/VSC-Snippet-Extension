@@ -218,8 +218,10 @@ class SnippetApp {
 
     const container = document.getElementById(DOM_IDS.snippetsContainer);
     if (isGrid) {
+      container.style.display = 'block';
       container.style.columns = '350px';
     } else {
+      container.style.display = 'flex';
       container.style.columns = 'unset';
     }
     this.activeViewType = isGrid ? 'grid' : 'list';
@@ -273,16 +275,8 @@ class SnippetApp {
       }
     }
 
-    if (this.activeViewType === 'list') {
-      const flexDiv = document.createElement('div');
-      flexDiv.style =
-        'display:flex; flex-direction:column; gap:10px; height: 100%; width:100%; min-height:0px;';
-      flexDiv.append(...snippetNodes);
-      container.append(flexDiv);
-    } else {
-      container.append(...snippetNodes);
-      hljs.highlightAll();
-    }
+    container.append(...snippetNodes);
+    hljs.highlightAll();
   }
 
   getSnippetCardComponent(snippet) {

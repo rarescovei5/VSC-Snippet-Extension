@@ -149,6 +149,8 @@ main {
   display: block;
 
   columns: 350px;
+
+  flex-direction: column;
 }
 
 /* Snippet Card Grid */
