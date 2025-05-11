@@ -281,24 +281,19 @@ class SnippetApp {
 
   getSnippetCardComponent(snippet) {
     const snippetNode = document.createElement('div');
-    snippetNode.className = `snippet-card-wrapper`;
+    snippetNode.className = `snippet-card`;
     snippetNode.innerHTML = `
-         <div class="snippet-card">
           <small>${snippet.language}</small>
           <div class="snippet-card-info">
             <h3>${snippet.title}</h3>
             <p>${snippet.description}</p>
           </div>
-          <pre class="snippet-card-code-container">
-            <code class="language-${snippet.language}">${escapeHtml(
-      snippet.code
-    )}</code>
-          </pre>
+          <pre class="snippet-card-code-container"><code class="language-${
+            snippet.language
+          }" >${escapeHtml(snippet.code)}</code></pre>
           <div class="snippet-card-buttons">
             <button class='copy-snippet-btn'>Copy</button>
-          </div>
-        </div>
-    `;
+          </div>`;
     snippetNode
       .querySelector('.copy-snippet-btn')
       .addEventListener('click', (e) => {

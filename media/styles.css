@@ -143,12 +143,13 @@ main {
   padding: 10px;
   gap: 10px;
 
+  width: 100%;
+
   height: 100%;
   overflow-y: auto;
 
-  display: block;
-
-  columns: 350px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
 
   flex-direction: column;
 }
@@ -158,16 +159,12 @@ main {
   position: relative;
   padding: 10px;
   border-radius: 5px;
+  display: flex;
+  flex-direction: column;
 
   background: #ffffff0d;
 }
-.snippet-card-wrapper {
-  break-inside: avoid;
-  page-break-inside: avoid; /* legacy */
-  -webkit-column-break-inside: avoid; /* old WebKit */
-  -moz-column-break-inside: avoid; /* old Firefox */
-  margin-bottom: 10px;
-}
+
 .snippet-card > small {
   position: absolute;
   top: 5px;
@@ -180,9 +177,14 @@ main {
 }
 .snippet-card-code-container {
   margin-block: 10px;
+
+  max-height: 300px;
+  flex: 1;
+  overflow: auto;
 }
 .snippet-card-code-container > code {
   border-radius: 5px;
+  height: 100%;
 }
 
 .snippet-card-buttons > button,
@@ -230,7 +232,6 @@ main {
   display: none;
 }
 
-.dragging > .snippet-card,
-.dragging.snippet-card-row {
+.dragging {
   opacity: 50%;
 }
