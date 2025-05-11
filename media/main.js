@@ -17,6 +17,10 @@ class SnippetApp {
     };
   }
 
+  isInFolder() {
+    return !Boolean(this.pageState.activeButton?.dataset.folderid);
+  }
+
   bindContextMethods() {
     this.handlePageNavigation = this.handlePageNavigation.bind(this);
     this.handleViewToggle = this.handleViewToggle.bind(this);
@@ -68,6 +72,15 @@ class SnippetApp {
     if (element) element.addEventListener('click', handler);
   }
 
+  addSnippetToFolder(folderId, snippetId) {
+    const folder = this.folders[folderId];
+    if (!folder) return;
+
+    if (!folder.snippets.includes(snippetId)) {
+      folder.snippets.push(snippetId);
+    }
+  }
+
   createFolderButton(folderId) {
     const container = document.getElementById(DOM_IDS.folderButtonsContainer);
     const folderIndex = folderId ?? container.childNodes.length + 1;
@@ -88,6 +101,21 @@ class SnippetApp {
     button.id = DOM_IDS.snippetsButton;
     button.addEventListener('click', this.handlePageNavigation);
 
+    // Logic for dragging snippets into folders
+    button.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    });
+
+    button.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const snippetId = e.dataTransfer.getData('text/plain');
+      if (!snippetId) return;
+
+      // Example: Add the snippet ID to the folder's array
+      this.addSnippetToFolder(folderId, snippetId);
+    });
+
     if (!folderId) {
       this.folders[folderIndex] = { folderName, snippets: [] };
     }
@@ -95,7 +123,8 @@ class SnippetApp {
     container.appendChild(button);
   }
 
-  async loadSnippets(folderId) {
+  async loadSnippets() {
+    const folderId = this.pageState.activeButton?.dataset.folderid;
     if (folderId) {
       this.currentSnippetsView.snippets = await this.fetchFolderSnippets(
         folderId
@@ -106,6 +135,16 @@ class SnippetApp {
           this.currentSnippetsView.currentPage
         ))
       );
+    }
+
+    const lastSnippet =
+      this.currentSnippetsView.snippets[
+        this.currentSnippetsView.snippets.length - 1
+      ];
+    if (typeof lastSnippet === typeof '') {
+      document.getElementById(DOM_IDS.snippetsContainer).innerHTML =
+        lastSnippet;
+      return;
     }
 
     this.renderSnippets(this.currentSnippetsView.snippets);
@@ -121,8 +160,7 @@ class SnippetApp {
         document.getElementById('settings-page').style.display = 'none';
         document.getElementById('snippets-page').style.display = 'flex';
 
-        const folderId = this.pageState.activeButton.dataset.folderid;
-        this.loadSnippets(folderId);
+        this.loadSnippets();
         break;
 
       case DOM_IDS.settingsButton:
@@ -137,17 +175,30 @@ class SnippetApp {
   }
 
   handleViewToggle(e) {
-    if (e.target.id === this.activeViewType) return;
+    const viewType = e.target.id === DOM_IDS.gridViewButton ? 'grid' : 'list';
+    if (viewType === this.activeViewType) return;
 
     const isGrid = e.target.id === DOM_IDS.gridViewButton;
-
     document
       .getElementById(DOM_IDS.gridViewButton)
       .classList.toggle('active', isGrid);
     document
       .getElementById(DOM_IDS.listViewButton)
       .classList.toggle('active', !isGrid);
+
+    const container = document.getElementById(DOM_IDS.snippetsContainer);
+    if (isGrid) {
+      container.style.display = 'block';
+      container.style.columns = '350px';
+    } else {
+      container.style.display = 'flex';
+      container.style.display = 'unset';
+    }
     this.activeViewType = isGrid ? 'grid' : 'list';
+
+    document.getElementById(DOM_IDS.snippetsContainer).innerHTML = '';
+
+    this.loadSnippets();
   }
 
   async fetchDiscoverSnippets(page, searchQuery, language) {
@@ -189,6 +240,8 @@ class SnippetApp {
 
       if (this.activeViewType === 'grid') {
         snippetNodes.push(this.getSnippetCardComponent(snippet));
+      } else {
+        snippetNodes.push(this.getSnippetRowComponent(snippet));
       }
     }
 
@@ -210,7 +263,6 @@ class SnippetApp {
             <code class="language-${snippet.language}">${snippet.code}</code>
           </pre>
           <div class="snippet-card-buttons">
-            <div><button class='btn save-btn'>Save</button></div>
             <button class='copy-snippet-btn'>Copy</button>
           </div>
         </div>
@@ -221,6 +273,31 @@ class SnippetApp {
         navigator.clipboard.writeText(snippet.code);
       });
 
+    if (this.isInFolder()) {
+      snippetNode.setAttribute('draggable', 'true');
+      snippetNode.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', snippet.id);
+        e.dataTransfer.effectAllowed = 'move';
+        snippetNode.classList.add('dragging');
+      });
+      snippetNode.addEventListener('dragend', () => {
+        snippetNode.classList.remove('dragging');
+      });
+    }
+
+    return snippetNode;
+  }
+  getSnippetRowComponent(snippet) {
+    const snippetNode = document.createElement('div');
+    snippetNode.className = `snippet-card-wrapper`;
+    snippetNode.innerHTML = `
+    <div class='snippet-card-row'>
+    </div>`;
+    // snippetNode
+    //   .querySelector('.copy-snippet-btn')
+    //   .addEventListener('click', (e) => {
+    //     navigator.clipboard.writeText(snippet.code);
+    //   });
     return snippetNode;
   }
 }

@@ -6,6 +6,8 @@
   border: 0;
   list-style: none;
 
+  user-select: none;
+
   font-family: var(--vscode-font-family);
   font-weight: var(--vscode-font-weight);
   color: var(--vscode-foreground);
@@ -44,6 +46,7 @@
 .text-center {
   text-align: center;
 }
+
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Main Layout -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 body {
   height: 100svh;
@@ -138,7 +141,6 @@ main {
 }
 #snippets-container {
   padding: 10px;
-  columns: 350px;
   gap: 10px;
 
   height: 100%;
@@ -146,6 +148,8 @@ main {
 
   display: block; /* Ensures column behavior + height works */
   box-sizing: border-box;
+
+  columns: 350px;
 }
 
 /* Snippet Card */
@@ -200,14 +204,11 @@ main {
   margin-bottom: 10px;
 }
 
-.save-btn:hover {
-  background: var(--vscode-editorWidget-border);
-}
-.save-btn:active {
-  background: var(--vscode-editorWidget-background);
-}
-
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Settings Page -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 #settings-page {
   display: none;
+}
+
+.dragging > .snippet-card {
+  opacity: 50%;
 }
