@@ -1,5 +1,4 @@
-/** TODO: Implement Searching by title and filtering by language on both snippet page and folder page
- *  Implement Infinite Scroll
+/** Implement Infinite Scroll
  *  Add something to settings page
  * */
 
@@ -58,6 +57,18 @@ class SnippetApp {
 
   handleSearch(e) {
     if (this.isInFolder()) {
+      const title = e.target.value.toLowerCase();
+      this.searchParams.title = title;
+
+      const filtered = this.currentSnippetsView.snippets.filter((snippet) => {
+        const matchesTitle = snippet.title.toLowerCase().includes(title);
+        const matchesLanguage = this.searchParams.language
+          ? snippet.language === this.searchParams.language
+          : true;
+        return matchesTitle && matchesLanguage;
+      });
+      document.getElementById(DOM_IDS.snippetsContainer).innerHTML = '';
+      this.renderSnippets(filtered);
     } else {
       clearTimeout(this.debounceTimer);
       this.debounceTimer = setTimeout(() => {
@@ -85,6 +96,29 @@ class SnippetApp {
     this.addClickListener(DOM_IDS.newFolderButton, () => {
       this.createFolderButton();
     });
+    document
+      .getElementById('select-language')
+      .addEventListener('change', (e) => {
+        this.searchParams.language = e.target.value;
+        console.log('ceva');
+        if (this.isInFolder()) {
+          const filtered = this.currentSnippetsView.snippets.filter(
+            (snippet) => {
+              const matchesTitle = snippet.title.toLowerCase().includes(title);
+              const matchesLanguage = this.searchParams.language
+                ? snippet.language === this.searchParams.language
+                : true;
+              return matchesTitle && matchesLanguage;
+            }
+          );
+          document.getElementById(DOM_IDS.snippetsContainer).innerHTML = '';
+          this.renderSnippets(filtered);
+        } else {
+          this.currentSnippetsView = { currentPage: 1, snippets: [] };
+          document.getElementById(DOM_IDS.snippetsContainer).innerHTML = '';
+          this.loadSnippets();
+        }
+      });
 
     this.loadSnippets();
 
@@ -115,17 +149,23 @@ class SnippetApp {
     const folderIndex = folderId ?? container.childNodes.length + 1;
 
     const button = document.createElement('button');
+    button.style.position = 'relative';
     const folderName = folderId
       ? `${this.folders[folderId].folderName}`
       : `Folder ${folderIndex}`;
 
-    const iconSVG = `
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="#fff" xmlns="http://www.w3.org/2000/svg">
+    const folderIconSVG = `
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="var(--vscode-foreground)" xmlns="http://www.w3.org/2000/svg">
         <path d="M14.5 3H7.71l-.85-.85L6.51 2h-5l-.5.5v11l.5.5h13l.5-.5v-10L14.5 3zm-.51 8.49V13h-12V7h4.49l.35-.15.86-.86H14v1.5l-.01 4zm0-6.49h-6.5l-.35.15-.86.86H2v-3h4.29l.85.85.36.15H14l-.01.99z"/>
-      </svg>`;
+      </svg>
+      `;
+    const closeIconSVG = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 16 16" fill="none">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M7.11641 7.99992L2.55835 12.558L3.44223 13.4419L8.00029 8.88381L12.5583 13.4419L13.4422 12.558L8.88417 7.99992L13.4422 3.44187L12.5583 2.55798L8.00029 7.11604L3.44223 2.55798L2.55835 3.44187L7.11641 7.99992Z" fill="var(--vscode-foreground)"/>
+    </svg>`;
 
-    button.innerHTML = `${iconSVG}${folderName}`;
-    button.className = 'btn btn-w-icon w-full';
+    button.innerHTML = `${folderIconSVG}${folderName}<div class="delete-folder-btn">${closeIconSVG}</div>`;
+    button.className = 'btn btn-w-icon w-full folder-btn';
     button.setAttribute('data-folderid', folderIndex);
     button.id = DOM_IDS.snippetsButton;
     button.addEventListener('click', this.handlePageNavigation);
@@ -218,11 +258,9 @@ class SnippetApp {
 
     const container = document.getElementById(DOM_IDS.snippetsContainer);
     if (isGrid) {
-      container.style.display = 'block';
-      container.style.columns = '350px';
+      container.style.display = 'grid';
     } else {
       container.style.display = 'flex';
-      container.style.columns = 'unset';
     }
     this.activeViewType = isGrid ? 'grid' : 'list';
 

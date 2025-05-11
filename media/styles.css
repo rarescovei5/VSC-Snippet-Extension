@@ -69,6 +69,7 @@ main {
   flex: 1;
   height: 100%;
 }
+
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Sidebar -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 .sidebar-top {
   padding: 20px;
@@ -99,6 +100,24 @@ main {
 .sidebar-bottom {
   padding: 10px 10px;
 }
+.delete-folder-btn {
+  display: none;
+  position: absolute;
+  right: 5px;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+}
+.delete-folder-btn:hover {
+  background: var(--vscode-editorWidget-border);
+}
+.folder-btn.active > .delete-folder-btn {
+  display: flex;
+}
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-   Main   -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Snippets Page -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
@@ -117,18 +136,27 @@ main {
 
   border-bottom: 1px solid var(--vscode-editorWidget-border);
 }
+.snippets-top-input-container {
+  flex: 1;
+  border: 1px solid var(--vscode-editorWidget-border);
+  border-radius: 5px;
+  padding: 10px 10px;
+
+  display: flex;
+  align-items: center;
+}
 #snippets-searchInput {
   background: transparent;
-  border: 1px solid var(--vscode-editorWidget-border);
-
   border-radius: 5px;
 
   font-size: 16px;
+  padding-left: 10px;
 
-  padding: 10px 20px;
   flex: 1;
+  outline: none;
 }
-#selected-language-btn {
+
+#select-language {
   padding: 10px;
   border-radius: 5px;
 
@@ -136,9 +164,11 @@ main {
   border: 1px solid var(--vscode-editorWidget-border);
 
   font-size: 16px;
+  outline: none;
 
   cursor: pointer;
 }
+
 #snippets-container {
   padding: 10px;
   gap: 10px;
@@ -150,6 +180,7 @@ main {
 
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-rows: max-content;
 
   flex-direction: column;
 }
