@@ -1,62 +1,76 @@
 export const stateService = {
   state: {
-    /**
-     * These snippets are Displayed in snippets container
-     */
-    snippets: [],
-    /**
-     * Array<{folderName: string; snippetIds:[]}>
-     */
+    // Folders (Local Data)
     folders: JSON.parse(localStorage.getItem('folders')) || [],
+
+    // Content Displayed in snippets Container
+    snippets: [],
     viewMode: 'grid', // or 'list' ()
     searchQuery: '',
     selectedLanguage: '',
+
+    // Current route/path in the app
+    currentPath: '',
+  },
+
+  // Route methods
+  setCurrentPath(path) {
+    this.state.currentPath = path;
+    this._notifyListeners('currentPath');
   },
 
   // Snippets methods
   setSnippets(snippets) {
     this.state.snippets = snippets;
-    this.notifyListeners('snippets');
+    this._notifyListeners('snippets');
   },
   addSnippets(snippets) {
     this.state.snippets.push(...snippets);
-    this.notifyListeners('snippets');
+    this._notifyListeners('snippets');
   },
 
   // Folders methods
   setFolders(folders) {
     this.state.folders = folders;
-    this.notifyListeners('folders');
+    this._notifyListeners('folders');
   },
   addFolder(folder) {
     this.state.folders.push(folder);
-    this.notifyListeners('folders');
+    this._notifyListeners('folders');
   },
   removeFolder(deletedIdx) {
     this.state.folders = this.state.folders.filter((_, idx) => idx !== deletedIdx);
-    this.notifyListeners('folders');
+    this._notifyListeners('folders');
   },
-  modifyFolder(folderIdx, option, newValue) {
-    switch (option) {
-      case 'folderName':
-      case 'snippetIds':
-        this.state.folders[folderIdx][option] = newValue;
-        break;
-      default:
-        throw new Error(`Invalid 'option' for modifyFolder`);
+  //Implement these
+  renameFolder(folderIdx, newName) {
+    this.state.folders[folderIdx].folderName = newName;
+    this._notifyListeners(`folders-${folderIdx}`);
+  },
+  removeSnippetFromFolder(folderIdx, snippetId) {
+    const folder = this.state.folders[folderIdx];
+    folder.snippets = folder.snippets.filter((id) => id !== snippetId);
+    this._notifyListeners(`folders-${folderIdx}`);
+  },
+
+  addSnippetToFolder(folderIdx, snippetId) {
+    const folder = this.state.folders[folderIdx];
+    if (!folder.snippets.includes(snippetId)) {
+      folder.snippets.push(snippetId);
+      this._notifyListeners(`folders-${folderIdx}`);
+      this._notifyListeners('folders');
     }
-    this.notifyListeners('folders');
   },
 
   // Filter methods
   setSelectedLanguage(language) {
     this.state.selectedLanguage = language;
-    this.notifyListeners('selectedLanguage');
+    this._notifyListeners('selectedLanguage');
   },
 
   setSearchQuery(query) {
     this.state.searchQuery = query;
-    this.notifyListeners('searchQuery');
+    this._notifyListeners('searchQuery');
   },
 
   // ViewMode
@@ -66,7 +80,7 @@ export const stateService = {
       return;
     }
     this.state.viewMode = mode;
-    this.notifyListeners('viewMode');
+    this._notifyListeners('viewMode');
   },
 
   // Utility
@@ -93,7 +107,7 @@ export const stateService = {
       this.listeners[key] = this.listeners[key].filter((cb) => cb !== callback);
     }
   },
-  notifyListeners(key) {
+  _notifyListeners(key) {
     if (this.listeners[key]) {
       this.listeners[key].forEach((callback) => callback(this.state[key]));
     }

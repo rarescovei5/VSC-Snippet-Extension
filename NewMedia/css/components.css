@@ -30,7 +30,7 @@
 #new-folder-btn {
   background: var(--vscode-editorWidget-background);
   border: 1px solid var(--vscode-editorWidget-border);
-  justify-content: center
+  justify-content: center;
 }
 
 /* Custom dropdown */
@@ -77,7 +77,7 @@
   background-color: var(--vscode-list-hoverBackground);
 }
 
-.language-option[data-selected="true"] {
+.language-option[data-selected='true'] {
   background-color: var(--vscode-list-activeSelectionBackground);
   color: var(--vscode-list-activeSelectionForeground);
 }
@@ -93,6 +93,7 @@
 }
 
 .search-input {
+  outline: none;
   border-radius: 5px;
   padding-left: 10px;
   font-size: 16px;
@@ -179,18 +180,7 @@
   gap: 5px;
 }
 
-.folder-option {
-  display: flex;
-  align-items: center;
-}
-
-.folder-option > span {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.folder-option.active > .delete-folder-btn {
+.active > .delete-folder-btn {
   display: flex;
 }
 

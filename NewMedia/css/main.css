@@ -26,14 +26,21 @@ Structure overview:
   body {
     flex-direction: column;
   }
-  
+  .sidebar-navigation {
+    max-height: 100px;
+  }
+
+  .sidebar-header {
+    display: none;
+  }
+
   .app-sidebar {
     flex-basis: auto;
     height: auto;
     border-right: none;
     border-bottom: 1px solid var(--vscode-editorWidget-border);
   }
-  
+
   .snippets-container {
     grid-template-columns: 1fr;
   }
