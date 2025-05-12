@@ -1,0 +1,45 @@
+/* Base styles for VSCode Snippet Extension */
+
+/* Reset and basic styling */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  list-style: none;
+  user-select: none;
+  font-family: var(--vscode-font-family);
+  font-weight: var(--vscode-font-weight);
+  color: var(--vscode-foreground);
+}
+
+/* Basic element styling */
+body {
+  height: 100svh;
+  display: flex;
+  flex-direction: row;
+  padding: 0px;
+}
+
+button {
+  cursor: pointer;
+  background: transparent;
+  font-size: 16px;
+  outline: none;
+}
+
+input {
+  background: transparent;
+  outline: none;
+  font-size: 16px;
+}
+
+code {
+  font-family: var(--vscode-editor-font-family);
+}
+
+/* Common background styles */
+.bg-subtle {
+  background: #ffffff0d;
+  border: 1px solid var(--vscode-editorWidget-border);
+}

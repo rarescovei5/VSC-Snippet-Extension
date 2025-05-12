@@ -99,13 +99,81 @@ class SnippetPanel {
 
   private async _getHtml(): Promise<string> {
     const webview = this._panel.webview;
+    
+    // New Code - Using the refactored structure from NewMedia folder
     const htmlUri = vscode.Uri.joinPath(
       this._extensionUri,
-      'media',
+      'NewMedia',
       'index.html'
     );
 
     try {
+      let html = (await vscode.workspace.fs.readFile(htmlUri)).toString();
+
+      // URI for the main script file
+      const scriptUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(this._extensionUri, 'NewMedia', 'js', 'app.js')
+      );
+      
+      // URIs for CSS files in the modular structure
+      const baseCssUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(this._extensionUri, 'NewMedia', 'css', 'base.css')
+      );
+      
+      const componentsCssUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(this._extensionUri, 'NewMedia', 'css', 'components.css')
+      );
+      
+      const layoutCssUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(this._extensionUri, 'NewMedia', 'css', 'layout.css')
+      );
+      
+      const utilitiesCssUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(this._extensionUri, 'NewMedia', 'css', 'utilities.css')
+      );
+      
+      const mainCssUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(this._extensionUri, 'NewMedia', 'css', 'main.css')
+      );
+      
+      // Using the existing highlight.js resources
+      const highlightJsUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(this._extensionUri, 'media', 'highlight.min.js')
+      );
+
+      const highlightCssUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(
+          this._extensionUri,
+          'media',
+          'atom-one-dark.min.css'
+        )
+      );
+
+      // Use a nonce to only allow specific scripts to be run
+      const nonce = getNonce();
+
+      // Replace placeholders in HTML file
+      html = html
+        .replace(/\${webview.cspSource}/g, webview.cspSource)
+        .replace(/\${nonce}/g, nonce)
+        .replace(/\${highlightCssUri}/g, highlightCssUri.toString())
+        .replace(/\${highlightJsUri}/g, highlightJsUri.toString())
+        .replace(/\${scriptUri}/g, scriptUri.toString())
+        .replace(/\${baseCssUri}/g, baseCssUri.toString())
+        .replace(/\${componentsCssUri}/g, componentsCssUri.toString())
+        .replace(/\${layoutCssUri}/g, layoutCssUri.toString())
+        .replace(/\${utilitiesCssUri}/g, utilitiesCssUri.toString())
+        .replace(/\${mainCssUri}/g, mainCssUri.toString());
+
+      return html;
+      
+      /* Old Code - commented out
+      const htmlUri = vscode.Uri.joinPath(
+        this._extensionUri,
+        'media',
+        'index.html'
+      );
+
       let html = (await vscode.workspace.fs.readFile(htmlUri)).toString();
 
       // Uris
@@ -140,6 +208,7 @@ class SnippetPanel {
         .replace(/\${scriptUri}/g, scriptUri.toString());
 
       return html;
+      */
     } catch (error) {
       console.error('Error reading HTML file:', error);
       return `<h1>Error loading webview</h1>`;
@@ -171,8 +240,11 @@ function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
     // Enable javascript in the webview
     enableScripts: true,
 
-    // And restrict the webview to only loading content from our extension's `media` directory.
-    localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')],
+    // And restrict the webview to only loading content from our extension's directories
+    localResourceRoots: [
+      vscode.Uri.joinPath(extensionUri, 'media'),
+      vscode.Uri.joinPath(extensionUri, 'NewMedia')
+    ],
   };
 }
 function getNonce() {
