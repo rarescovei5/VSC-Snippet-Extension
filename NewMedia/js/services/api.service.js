@@ -1,3 +1,4 @@
+import { searchComponent } from '../components/search.js';
 import { stateService } from './state.service.js';
 
 export const apiService = {
@@ -22,7 +23,7 @@ export const apiService = {
     try {
       const queryParams = new URLSearchParams({
         page,
-        limit: 30,
+        limit: 10,
         ...(stateService.state.searchQuery.length > 0 && { title: stateService.state.searchQuery }),
         ...(stateService.state.selectedLanguage.length > 0 && { language: stateService.state.selectedLanguage }),
       });
@@ -34,6 +35,7 @@ export const apiService = {
         throw new Error(`API request failed with status ${response.status}`);
       }
 
+      searchComponent.cosmetic.currentPage++;
       return response.json();
     } catch (error) {
       console.error('Error fetching discover snippets:', error);

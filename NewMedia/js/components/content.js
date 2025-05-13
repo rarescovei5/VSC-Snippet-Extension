@@ -1,4 +1,6 @@
+import { apiService } from '../services/api.service.js';
 import { stateService } from '../services/state.service.js';
+import { searchComponent } from './search.js';
 
 export const contentComponent = {
   pages: {
@@ -31,6 +33,7 @@ export const contentComponent = {
         this.pages.snippetsPageEl.classList.remove('hidden');
         // Highlight snippets BTN
         document.getElementById('snippets-btn').classList.add('active');
+
         break;
       // Presumably folder opened
       default:

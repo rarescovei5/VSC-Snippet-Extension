@@ -1,5 +1,6 @@
 import { apiService } from '../services/api.service.js';
 import { stateService } from '../services/state.service.js';
+import { snippetsComponent } from './snippets.js';
 
 export const searchComponent = {
   searchBarEl: document.getElementById('snippets-searchInput'),
@@ -57,6 +58,7 @@ export const searchComponent = {
   _bindContextMethods() {
     this.handleSearchChange = this.handleSearchChange.bind(this);
     this.filterSnippets = this.filterSnippets.bind(this);
+    this.createInfiniteScrollHandler = this.createInfiniteScrollHandler.bind(this);
   },
 
   // Filters
@@ -94,39 +96,40 @@ export const searchComponent = {
 
   // fetch current snippets based on filters
   async filterSnippets() {
-    this.cosmetic.currentPage = 1;
+    snippetsComponent._reset();
     if (stateService.state.currentPath === 'snippets') {
       apiService.getDiscoverSnippets().then((data) => {
         if (data.totalPages === data.currentPage) this.cosmetic.bKeepRequesting = false;
-        console.log(data.records);
         stateService.setSnippets(data.records);
       });
     } else {
-      const folderID = parseInt(stateService.state.currentPath.split('-')[1]);
-      stateService.setSnippets(stateService.filterSnippets(stateService.state.folders[folderID].snippetIds));
+      if (!/^folder-\d+$/.test(stateService.state.currentPath)) return;
+      stateService.setSnippets(stateService.filterSnippets(snippetsComponent.currentFolderSnippets));
     }
   },
 
   // Infinite Scroll Used in Snippets Component
   createInfiniteScrollHandler() {
     let isLoading = false;
+    const searchComponentRef = this;
 
     return function handleInfiniteScroll() {
       if (stateService.state.currentPath !== 'snippets') return;
 
-      if (isLoading || !this.cosmetic.bKeepRequesting) return;
+      if (isLoading || !searchComponentRef.cosmetic.bKeepRequesting) return;
 
       const scrolledToBottom =
-        snippetsContainer.scrollTop + snippetsContainer.clientHeight >= snippetsContainer.scrollHeight - 10;
+        this.snippetsContainer.scrollTop + this.snippetsContainer.clientHeight >=
+        this.snippetsContainer.scrollHeight - 10;
 
       if (scrolledToBottom) {
         isLoading = true;
 
         apiService
-          .getDiscoverSnippets()
+          .getDiscoverSnippets(searchComponentRef.cosmetic.currentPage)
           .then((data) => {
             if (data.totalPages === data.currentPage) {
-              this.cosmetic.bKeepRequesting = false;
+              searchComponentRef.cosmetic.bKeepRequesting = false;
             }
             stateService.addSnippets(data.records);
           })
