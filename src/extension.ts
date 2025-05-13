@@ -5,10 +5,7 @@ export function activate(context: vscode.ExtensionContext) {
   /**
    * Create a button to open the webview for the extension
    */
-  const sBarButton = vscode.window.createStatusBarItem(
-    vscode.StatusBarAlignment.Left,
-    0
-  );
+  const sBarButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 0);
   sBarButton.text = '$(notebook-mimetype) Code Snippets';
   sBarButton.command = 'principium-snippets.openWebview';
   sBarButton.tooltip = 'Open Code Snippet Manager';
@@ -51,11 +48,7 @@ class SnippetPanel {
     };
     loadHtml();
 
-    this._panel.iconPath = vscode.Uri.joinPath(
-      this._extensionUri,
-      'media',
-      'code.svg'
-    );
+    this._panel.iconPath = vscode.Uri.joinPath(this._extensionUri, 'media', 'code.svg');
 
     // Listen for when the panel is disposed
     // This happens when the user closes the panel or when the panel is closed programmatically
@@ -76,9 +69,7 @@ class SnippetPanel {
   }
 
   public static createOrShow(extensionUri: vscode.Uri) {
-    const column = vscode.window.activeTextEditor
-      ? vscode.window.activeTextEditor.viewColumn
-      : undefined;
+    const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
 
     // If we already have a panel, show it.
     if (SnippetPanel.currentPanel) {
@@ -99,54 +90,38 @@ class SnippetPanel {
 
   private async _getHtml(): Promise<string> {
     const webview = this._panel.webview;
-    
-    // New Code - Using the refactored structure from NewMedia folder
-    const htmlUri = vscode.Uri.joinPath(
-      this._extensionUri,
-      'NewMedia',
-      'index.html'
-    );
+
+    // New Code - Using the refactored structure from mediaV2 folder
+    const htmlUri = vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'index.html');
 
     try {
       let html = (await vscode.workspace.fs.readFile(htmlUri)).toString();
 
       // URI for the main script file
-      const scriptUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(this._extensionUri, 'NewMedia', 'js', 'app.js')
-      );
-      
+      const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'js', 'app.js'));
+
       // URIs for CSS files in the modular structure
-      const baseCssUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(this._extensionUri, 'NewMedia', 'css', 'base.css')
-      );
-      
+      const baseCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'css', 'base.css'));
+
       const componentsCssUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(this._extensionUri, 'NewMedia', 'css', 'components.css')
-      );
-      
-      const layoutCssUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(this._extensionUri, 'NewMedia', 'css', 'layout.css')
-      );
-      
-      const utilitiesCssUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(this._extensionUri, 'NewMedia', 'css', 'utilities.css')
-      );
-      
-      const mainCssUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(this._extensionUri, 'NewMedia', 'css', 'main.css')
-      );
-      
-      // Using the existing highlight.js resources
-      const highlightJsUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(this._extensionUri, 'media', 'highlight.min.js')
+        vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'css', 'components.css')
       );
 
+      const layoutCssUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'css', 'layout.css')
+      );
+
+      const utilitiesCssUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'css', 'utilities.css')
+      );
+
+      const mainCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'css', 'main.css'));
+
+      // Using the existing highlight.js resources
+      const highlightJsUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'highlight.min.js'));
+
       const highlightCssUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(
-          this._extensionUri,
-          'media',
-          'atom-one-dark.min.css'
-        )
+        vscode.Uri.joinPath(this._extensionUri, 'media', 'atom-one-dark.min.css')
       );
 
       // Use a nonce to only allow specific scripts to be run
@@ -166,7 +141,7 @@ class SnippetPanel {
         .replace(/\${mainCssUri}/g, mainCssUri.toString());
 
       return html;
-      
+
       /* Old Code - commented out
       const htmlUri = vscode.Uri.joinPath(
         this._extensionUri,
@@ -241,16 +216,12 @@ function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
     enableScripts: true,
 
     // And restrict the webview to only loading content from our extension's directories
-    localResourceRoots: [
-      vscode.Uri.joinPath(extensionUri, 'media'),
-      vscode.Uri.joinPath(extensionUri, 'NewMedia')
-    ],
+    localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'mediaV1'), vscode.Uri.joinPath(extensionUri, 'mediaV2')],
   };
 }
 function getNonce() {
   let text = '';
-  const possible =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   for (let i = 0; i < 32; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
   }
