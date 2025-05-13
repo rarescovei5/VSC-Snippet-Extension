@@ -88,102 +88,90 @@ class SnippetPanel {
     SnippetPanel.currentPanel = new SnippetPanel(panel, extensionUri);
   }
 
+  private async getMediaV1(webview: vscode.Webview): Promise<string> {
+    const htmlUri = vscode.Uri.joinPath(this._extensionUri, 'media', 'index.html');
+
+    let html = (await vscode.workspace.fs.readFile(htmlUri)).toString();
+
+    // Uris
+    const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
+    const stylesUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'styles.css'));
+    const highlightJsUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'highlight.min.js'));
+
+    const highlightCssUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'media', 'atom-one-dark.min.css')
+    );
+
+    // Use a nonce to only allow specific scripts to be run
+    const nonce = getNonce();
+
+    // Replace placeholders in HTML file
+    html = html
+      .replace(/\${webview.cspSource}/g, webview.cspSource)
+      .replace(/\${nonce}/g, nonce)
+      .replace(/\${highlightCssUri}/g, highlightCssUri.toString())
+      .replace(/\${highlightJsUri}/g, highlightJsUri.toString())
+      .replace(/\${stylesUri}/g, stylesUri.toString())
+      .replace(/\${scriptUri}/g, scriptUri.toString());
+
+    return html;
+  }
+  private async getMediaV2(webview: vscode.Webview): Promise<string> {
+    // New Code - Using the refactored structure from mediaV2 folder
+    const htmlUri = vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'index.html');
+    let html = (await vscode.workspace.fs.readFile(htmlUri)).toString();
+
+    // URI for the main script file
+    const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'js', 'app.js'));
+
+    // URIs for CSS files in the modular structure
+    const baseCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'css', 'base.css'));
+
+    const componentsCssUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'css', 'components.css')
+    );
+
+    const layoutCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'css', 'layout.css'));
+
+    const utilitiesCssUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'css', 'utilities.css')
+    );
+
+    const mainCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'css', 'main.css'));
+
+    // Using the existing highlight.js resources
+    const highlightJsUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'assets', 'vendor', 'highlight.min.js')
+    );
+
+    const highlightCssUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'assets', 'vendor', 'atom-one-dark.min.css')
+    );
+
+    // Use a nonce to only allow specific scripts to be run
+    const nonce = getNonce();
+
+    // Replace placeholders in HTML file
+    html = html
+      .replace(/\${webview.cspSource}/g, webview.cspSource)
+      .replace(/\${nonce}/g, nonce)
+      .replace(/\${highlightCssUri}/g, highlightCssUri.toString())
+      .replace(/\${highlightJsUri}/g, highlightJsUri.toString())
+      .replace(/\${scriptUri}/g, scriptUri.toString())
+      .replace(/\${baseCssUri}/g, baseCssUri.toString())
+      .replace(/\${componentsCssUri}/g, componentsCssUri.toString())
+      .replace(/\${layoutCssUri}/g, layoutCssUri.toString())
+      .replace(/\${utilitiesCssUri}/g, utilitiesCssUri.toString())
+      .replace(/\${mainCssUri}/g, mainCssUri.toString());
+
+    return html;
+  }
+
   private async _getHtml(): Promise<string> {
     const webview = this._panel.webview;
 
-    // New Code - Using the refactored structure from mediaV2 folder
-    const htmlUri = vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'index.html');
-
     try {
-      let html = (await vscode.workspace.fs.readFile(htmlUri)).toString();
-
-      // URI for the main script file
-      const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'js', 'app.js'));
-
-      // URIs for CSS files in the modular structure
-      const baseCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'css', 'base.css'));
-
-      const componentsCssUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'css', 'components.css')
-      );
-
-      const layoutCssUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'css', 'layout.css')
-      );
-
-      const utilitiesCssUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'css', 'utilities.css')
-      );
-
-      const mainCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'mediaV2', 'css', 'main.css'));
-
-      // Using the existing highlight.js resources
-      const highlightJsUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'highlight.min.js'));
-
-      const highlightCssUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(this._extensionUri, 'media', 'atom-one-dark.min.css')
-      );
-
-      // Use a nonce to only allow specific scripts to be run
-      const nonce = getNonce();
-
-      // Replace placeholders in HTML file
-      html = html
-        .replace(/\${webview.cspSource}/g, webview.cspSource)
-        .replace(/\${nonce}/g, nonce)
-        .replace(/\${highlightCssUri}/g, highlightCssUri.toString())
-        .replace(/\${highlightJsUri}/g, highlightJsUri.toString())
-        .replace(/\${scriptUri}/g, scriptUri.toString())
-        .replace(/\${baseCssUri}/g, baseCssUri.toString())
-        .replace(/\${componentsCssUri}/g, componentsCssUri.toString())
-        .replace(/\${layoutCssUri}/g, layoutCssUri.toString())
-        .replace(/\${utilitiesCssUri}/g, utilitiesCssUri.toString())
-        .replace(/\${mainCssUri}/g, mainCssUri.toString());
-
-      return html;
-
-      /* Old Code - commented out
-      const htmlUri = vscode.Uri.joinPath(
-        this._extensionUri,
-        'media',
-        'index.html'
-      );
-
-      let html = (await vscode.workspace.fs.readFile(htmlUri)).toString();
-
-      // Uris
-      const scriptUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js')
-      );
-      const stylesUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(this._extensionUri, 'media', 'styles.css')
-      );
-      const highlightJsUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(this._extensionUri, 'media', 'highlight.min.js')
-      );
-
-      const highlightCssUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(
-          this._extensionUri,
-          'media',
-          'atom-one-dark.min.css'
-        )
-      );
-
-      // Use a nonce to only allow specific scripts to be run
-      const nonce = getNonce();
-
-      // Replace placeholders in HTML file
-      html = html
-        .replace(/\${webview.cspSource}/g, webview.cspSource)
-        .replace(/\${nonce}/g, nonce)
-        .replace(/\${highlightCssUri}/g, highlightCssUri.toString())
-        .replace(/\${highlightJsUri}/g, highlightJsUri.toString())
-        .replace(/\${stylesUri}/g, stylesUri.toString())
-        .replace(/\${scriptUri}/g, scriptUri.toString());
-
-      return html;
-      */
+      return this.getMediaV2(webview);
     } catch (error) {
       console.error('Error reading HTML file:', error);
       return `<h1>Error loading webview</h1>`;

@@ -86,7 +86,10 @@ export const stateService = {
   filterSnippets(snippets) {
     const filtered = snippets.filter((snippet) => {
       const matchesTitle = snippet.title.toLowerCase().includes(this.state.searchQuery);
-      const matchesLanguage = this.state.selectedLanguage ? snippet.language === this.state.selectedLanguage : true;
+      const matchesLanguage = this.state.selectedLanguage
+        ? snippet.language.toLowerCase() === this.state.selectedLanguage.toLowerCase()
+        : true;
+
       return matchesTitle && matchesLanguage;
     });
     return filtered;
