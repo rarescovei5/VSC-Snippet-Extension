@@ -1,3 +1,5 @@
+import { stateService } from './state.service.js';
+
 export const apiService = {
   // VSC Api
   vscode: acquireVsCodeApi(),
@@ -16,13 +18,13 @@ export const apiService = {
 
   // Principium API
   baseUrl: 'http://localhost:3000',
-  async getDiscoverSnippets(page = 1, language = '', title = '') {
+  async getDiscoverSnippets(page = 1) {
     try {
       const queryParams = new URLSearchParams({
         page,
         limit: 30,
-        ...(searchQuery.length > 0 && { title: searchQuery }),
-        ...(language.length > 0 && { language }),
+        ...(stateService.state.searchQuery.length > 0 && { title: stateService.state.searchQuery }),
+        ...(stateService.state.selectedLanguage.length > 0 && { language: stateService.state.selectedLanguage }),
       });
 
       const url = `${this.baseUrl}/api/v1/snippets/discover?${queryParams.toString()}`;
@@ -32,13 +34,17 @@ export const apiService = {
         throw new Error(`API request failed with status ${response.status}`);
       }
 
-      const data = await response.json();
-      return data.snippets || [];
+      return response.json();
     } catch (error) {
       console.error('Error fetching discover snippets:', error);
     }
   },
-  async getSnippetsByIds(snippetIds) {
+  async getSnippetsByIds(folderId) {
+    const folder = stateService.state.folders[folderId];
+    if (!folder) {
+      return [];
+    }
+    const { snippetIds } = folder;
     if (!snippetIds || snippetIds.length === 0) {
       return [];
     }
@@ -57,8 +63,7 @@ export const apiService = {
         throw new Error(`API request failed with status ${response.status}`);
       }
 
-      const data = await response.json();
-      return data.snippets || [];
+      return response.json();
     } catch (error) {
       console.error('Error fetching snippets by IDs:', error);
     }

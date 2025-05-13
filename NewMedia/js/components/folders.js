@@ -25,7 +25,7 @@ export const foldersComponent = {
   createNewFolder() {
     const newFolderData = {
       folderName: `Folder ${stateService.state.folders.length + 1}`,
-      snippets: [],
+      snippetIds: [],
     };
     stateService.addFolder(newFolderData);
   },

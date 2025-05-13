@@ -42,21 +42,20 @@ export const stateService = {
     this.state.folders = this.state.folders.filter((_, idx) => idx !== deletedIdx);
     this._notifyListeners('folders');
   },
-  //Implement these
   renameFolder(folderIdx, newName) {
     this.state.folders[folderIdx].folderName = newName;
     this._notifyListeners(`folders-${folderIdx}`);
   },
   removeSnippetFromFolder(folderIdx, snippetId) {
     const folder = this.state.folders[folderIdx];
-    folder.snippets = folder.snippets.filter((id) => id !== snippetId);
+    folder.snippetIds = folder.snippetIds.filter((id) => id !== snippetId);
     this._notifyListeners(`folders-${folderIdx}`);
   },
 
   addSnippetToFolder(folderIdx, snippetId) {
     const folder = this.state.folders[folderIdx];
-    if (!folder.snippets.includes(snippetId)) {
-      folder.snippets.push(snippetId);
+    if (!folder.snippetIds.includes(snippetId)) {
+      folder.snippetIds.push(snippetId);
       this._notifyListeners(`folders-${folderIdx}`);
       this._notifyListeners('folders');
     }
@@ -84,8 +83,8 @@ export const stateService = {
   },
 
   // Utility
-  getFilteredSnippets() {
-    const filtered = this.state.snippets.filter((snippet) => {
+  filterSnippets(snippets) {
+    const filtered = snippets.filter((snippet) => {
       const matchesTitle = snippet.title.toLowerCase().includes(this.state.searchQuery);
       const matchesLanguage = this.state.selectedLanguage ? snippet.language === this.state.selectedLanguage : true;
       return matchesTitle && matchesLanguage;

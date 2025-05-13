@@ -33,6 +33,12 @@
   justify-content: center;
 }
 
+button > span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Custom dropdown */
 .language-filter-container {
   position: relative;
@@ -54,9 +60,10 @@
   position: absolute;
   width: 100%;
   top: calc(100% + 5px);
-  left: 0;
+  right: 0;
   z-index: 10;
   max-height: 300px;
+  min-width: 150px;
   overflow-y: auto;
   background-color: var(--vscode-dropdown-background);
   border: 1px solid var(--vscode-editorWidget-border);
@@ -91,13 +98,17 @@
   display: flex;
   align-items: center;
 }
-
+.search-input-wrapper:has(.search-input:focus) > svg {
+  display: none;
+}
 .search-input {
-  outline: none;
   border-radius: 5px;
   padding-left: 10px;
   font-size: 16px;
   flex: 1;
+}
+.search-input:focus {
+  outline: none;
 }
 
 /* Snippet Cards */
@@ -180,7 +191,7 @@
   gap: 5px;
 }
 
-.active > .delete-folder-btn {
+.active:hover > .delete-folder-btn {
   display: flex;
 }
 
