@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -32,32 +31,61 @@
   <body>
     <aside class="app-sidebar">
       <header class="sidebar-header">
-        <svg class="code-icon" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="var(--vscode-foreground)">
-          <path d="M4.708 5.578L2.061 8.224l2.647 2.646-.708.708-3-3V7.87l3-3 .708.708zm7-.708L11 5.578l2.647 2.646L11 10.87l.708.708 3-3V7.87l-3-3zM4.908 13l.894.448 5-10L9.908 3l-5 10z" />
+        <svg
+          class="code-icon"
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="var(--vscode-foreground)"
+        >
+          <path
+            d="M4.708 5.578L2.061 8.224l2.647 2.646-.708.708-3-3V7.87l3-3 .708.708zm7-.708L11 5.578l2.647 2.646L11 10.87l.708.708 3-3V7.87l-3-3zM4.908 13l.894.448 5-10L9.908 3l-5 10z"
+          />
         </svg>
         <h1 class="app-title">Code Snippets</h1>
       </header>
-      
+
       <nav class="sidebar-navigation">
         <button class="nav-button" id="settings-btn">
-          <svg class="settings-icon" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="var(--vscode-foreground)">
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M19.85 8.75l4.15.83v4.84l-4.15.83 2.35 3.52-3.43 3.43-3.52-2.35-.83 4.15H9.58l-.83-4.15-3.52 2.35-3.43-3.43 2.35-3.52L0 14.42V9.58l4.15-.83L1.8 5.23 5.23 1.8l3.52 2.35L9.58 0h4.84l.83 4.15 3.52-2.35 3.43 3.43-2.35 3.52zm-1.57 5.07l4-.81v-2l-4-.81-.54-1.3 2.29-3.43-1.43-1.43-3.43 2.29-1.3-.54-.81-4h-2l-.81 4-1.3.54-3.43-2.29-1.43 1.43L6.38 8.9l-.54 1.3-4 .81v2l4 .81.54 1.3-2.29 3.43 1.43 1.43 3.43-2.29 1.3.54.81 4h2l.81-4 1.3-.54 3.43 2.29 1.43-1.43-2.29-3.43.54-1.3zm-8.186-4.672A3.43 3.43 0 0 1 12 8.57 3.44 3.44 0 0 1 15.43 12a3.43 3.43 0 1 1-5.336-2.852zm.956 4.274c.281.188.612.288.95.288A1.7 1.7 0 0 0 13.71 12a1.71 1.71 0 1 0-2.66 1.422z" />
+          <svg
+            class="settings-icon"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="var(--vscode-foreground)"
+          >
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M19.85 8.75l4.15.83v4.84l-4.15.83 2.35 3.52-3.43 3.43-3.52-2.35-.83 4.15H9.58l-.83-4.15-3.52 2.35-3.43-3.43 2.35-3.52L0 14.42V9.58l4.15-.83L1.8 5.23 5.23 1.8l3.52 2.35L9.58 0h4.84l.83 4.15 3.52-2.35 3.43 3.43-2.35 3.52zm-1.57 5.07l4-.81v-2l-4-.81-.54-1.3 2.29-3.43-1.43-1.43-3.43 2.29-1.3-.54-.81-4h-2l-.81 4-1.3.54-3.43-2.29-1.43 1.43L6.38 8.9l-.54 1.3-4 .81v2l4 .81.54 1.3-2.29 3.43 1.43 1.43 3.43-2.29 1.3.54.81 4h2l.81-4 1.3-.54 3.43 2.29 1.43-1.43-2.29-3.43.54-1.3zm-8.186-4.672A3.43 3.43 0 0 1 12 8.57 3.44 3.44 0 0 1 15.43 12a3.43 3.43 0 1 1-5.336-2.852zm.956 4.274c.281.188.612.288.95.288A1.7 1.7 0 0 0 13.71 12a1.71 1.71 0 1 0-2.66 1.422z"
+            />
           </svg>
           Settings
         </button>
         <button class="nav-button" id="snippets-btn">
-          <svg class="globe-icon" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="var(--vscode-foreground)">
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M8.5 1a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13zm4.894 4a5.527 5.527 0 0 0-3.053-2.676c.444.84.765 1.74.953 2.676h2.1zm.582 2.995A5.11 5.11 0 0 0 14 7.5a5.464 5.464 0 0 0-.213-1.5h-2.342c.032.331.055.664.055 1a10.114 10.114 0 0 1-.206 2h2.493c.095-.329.158-.665.19-1.005zm-3.535 0l.006-.051A9.04 9.04 0 0 0 10.5 7a8.994 8.994 0 0 0-.076-1H6.576A8.82 8.82 0 0 0 6.5 7a8.98 8.98 0 0 0 .233 2h3.534c.077-.332.135-.667.174-1.005zM10.249 5a8.974 8.974 0 0 0-1.255-2.97C8.83 2.016 8.666 2 8.5 2a3.62 3.62 0 0 0-.312.015l-.182.015L8 2.04A8.97 8.97 0 0 0 6.751 5h3.498zM5.706 5a9.959 9.959 0 0 1 .966-2.681A5.527 5.527 0 0 0 3.606 5h2.1zM3.213 6A5.48 5.48 0 0 0 3 7.5 5.48 5.48 0 0 0 3.213 9h2.493A10.016 10.016 0 0 1 5.5 7c0-.336.023-.669.055-1H3.213zm2.754 4h-2.36a5.515 5.515 0 0 0 3.819 2.893A10.023 10.023 0 0 1 5.967 10zM8.5 12.644A8.942 8.942 0 0 0 9.978 10H7.022A8.943 8.943 0 0 0 8.5 12.644zM11.033 10a10.024 10.024 0 0 1-1.459 2.893A5.517 5.517 0 0 0 13.393 10h-2.36z" />
+          <svg
+            class="globe-icon"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="var(--vscode-foreground)"
+          >
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M8.5 1a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13zm4.894 4a5.527 5.527 0 0 0-3.053-2.676c.444.84.765 1.74.953 2.676h2.1zm.582 2.995A5.11 5.11 0 0 0 14 7.5a5.464 5.464 0 0 0-.213-1.5h-2.342c.032.331.055.664.055 1a10.114 10.114 0 0 1-.206 2h2.493c.095-.329.158-.665.19-1.005zm-3.535 0l.006-.051A9.04 9.04 0 0 0 10.5 7a8.994 8.994 0 0 0-.076-1H6.576A8.82 8.82 0 0 0 6.5 7a8.98 8.98 0 0 0 .233 2h3.534c.077-.332.135-.667.174-1.005zM10.249 5a8.974 8.974 0 0 0-1.255-2.97C8.83 2.016 8.666 2 8.5 2a3.62 3.62 0 0 0-.312.015l-.182.015L8 2.04A8.97 8.97 0 0 0 6.751 5h3.498zM5.706 5a9.959 9.959 0 0 1 .966-2.681A5.527 5.527 0 0 0 3.606 5h2.1zM3.213 6A5.48 5.48 0 0 0 3 7.5 5.48 5.48 0 0 0 3.213 9h2.493A10.016 10.016 0 0 1 5.5 7c0-.336.023-.669.055-1H3.213zm2.754 4h-2.36a5.515 5.515 0 0 0 3.819 2.893A10.023 10.023 0 0 1 5.967 10zM8.5 12.644A8.942 8.942 0 0 0 9.978 10H7.022A8.943 8.943 0 0 0 8.5 12.644zM11.033 10a10.024 10.024 0 0 1-1.459 2.893A5.517 5.517 0 0 0 13.393 10h-2.36z"
+            />
           </svg>
           Snippets
         </button>
         <div class="folder-list" id="folder-buttons-container"></div>
       </nav>
-      
+
       <footer class="sidebar-footer">
-        <button class="action-button" id="new-folder-btn">
-          New Folder
-        </button>
+        <button class="action-button" id="new-folder-btn">New Folder</button>
       </footer>
     </aside>
     <main class="app-main">
@@ -65,17 +93,38 @@
         <header class="content-header">
           <div class="search-container">
             <div class="search-input-wrapper">
-              <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M15.2502 1.02546e-06C13.6607 -0.000791296 12.1048 0.457574 10.7697 1.32007C9.43447 2.18256 8.37681 3.4124 7.724 4.8617C7.07118 6.31099 6.85102 7.91801 7.08984 9.4895C7.32867 11.061 8.01628 12.5301 9.07019 13.72L1.00024 22.88L2.12024 23.88L10.1703 14.76C11.2057 15.5693 12.4195 16.1196 13.7106 16.365C15.0017 16.6104 16.3328 16.5437 17.5929 16.1707C18.853 15.7976 20.0058 15.1288 20.9552 14.2201C21.9046 13.3114 22.6232 12.1891 23.0511 10.9465C23.4791 9.70396 23.6041 8.37703 23.4155 7.07642C23.227 5.77581 22.7304 4.53915 21.9673 3.46924C21.2041 2.39933 20.1964 1.52711 19.0281 0.925416C17.8597 0.323719 16.5644 0.00991516 15.2502 0.0100108V1.02546e-06ZM15.2502 15C13.9152 15 12.6102 14.6041 11.5001 13.8624C10.3901 13.1207 9.52493 12.0665 9.01404 10.8331C8.50315 9.59973 8.36943 8.24248 8.62988 6.93311C8.89033 5.62373 9.53329 4.42106 10.4773 3.47705C11.4213 2.53305 12.624 1.89009 13.9333 1.62964C15.2427 1.36919 16.6 1.5029 17.8334 2.01379C19.0668 2.52469 20.121 3.38985 20.8627 4.49988C21.6044 5.60991 22.0002 6.91498 22.0002 8.25C22.0002 10.0402 21.2891 11.7571 20.0232 13.023C18.7573 14.2888 17.0405 15 15.2502 15Z" fill="var(--vscode-editorWidget-border)" />
+              <svg
+                class="search-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M15.2502 1.02546e-06C13.6607 -0.000791296 12.1048 0.457574 10.7697 1.32007C9.43447 2.18256 8.37681 3.4124 7.724 4.8617C7.07118 6.31099 6.85102 7.91801 7.08984 9.4895C7.32867 11.061 8.01628 12.5301 9.07019 13.72L1.00024 22.88L2.12024 23.88L10.1703 14.76C11.2057 15.5693 12.4195 16.1196 13.7106 16.365C15.0017 16.6104 16.3328 16.5437 17.5929 16.1707C18.853 15.7976 20.0058 15.1288 20.9552 14.2201C21.9046 13.3114 22.6232 12.1891 23.0511 10.9465C23.4791 9.70396 23.6041 8.37703 23.4155 7.07642C23.227 5.77581 22.7304 4.53915 21.9673 3.46924C21.2041 2.39933 20.1964 1.52711 19.0281 0.925416C17.8597 0.323719 16.5644 0.00991516 15.2502 0.0100108V1.02546e-06ZM15.2502 15C13.9152 15 12.6102 14.6041 11.5001 13.8624C10.3901 13.1207 9.52493 12.0665 9.01404 10.8331C8.50315 9.59973 8.36943 8.24248 8.62988 6.93311C8.89033 5.62373 9.53329 4.42106 10.4773 3.47705C11.4213 2.53305 12.624 1.89009 13.9333 1.62964C15.2427 1.36919 16.6 1.5029 17.8334 2.01379C19.0668 2.52469 20.121 3.38985 20.8627 4.49988C21.6044 5.60991 22.0002 6.91498 22.0002 8.25C22.0002 10.0402 21.2891 11.7571 20.0232 13.023C18.7573 14.2888 17.0405 15 15.2502 15Z"
+                  fill="var(--vscode-editorWidget-border)"
+                />
               </svg>
               <input type="text" placeholder="Search Snippets..." id="snippets-searchInput" class="search-input" />
             </div>
-            
+
             <div class="language-filter-container" id="language-filter-container">
               <button class="language-filter-button" id="language-filter-button">
                 <span class="selected-language" id="selected-language">All Languages</span>
-                <svg class="dropdown-icon" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 1L5 5L9 1" stroke="var(--vscode-editorWidget-border)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg
+                  class="dropdown-icon"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 16 16"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="var(--vscode-editorWidget-border)"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M7.976 10.072l4.357-4.357.62.618L8.284 11h-.618L3 6.333l.619-.618 4.357 4.357z"
+                  />
                 </svg>
               </button>
               <div class="language-dropdown" id="language-dropdown">
@@ -118,24 +167,25 @@
               </div>
             </div>
           </div>
-        
+
           <div class="view-options">
             <button class="view-button active" id="grid-view-btn">Grid View</button>
             <button class="view-button" id="list-view-btn">List View</button>
           </div>
         </header>
-        
+
         <div class="snippets-container" id="snippets-container"></div>
       </section>
-      
+
       <section class="content-section hidden" id="settings-page"></section>
     </main>
-    <!-- Vendor scripts -->  
+    <div id="remove-snippet-container"></div>
+    <!-- Vendor scripts -->
     <script nonce="${nonce}" src="${highlightJsUri}"></script>
-    
-    <!-- Application modules -->  
+
+    <!-- Application modules -->
     <script nonce="${nonce}" type="module" src="${scriptUri}"></script>
-    
+
     <!-- The app.js file will import the following modules -->
     <!-- 
     import { apiService } from './services/api.service.js';

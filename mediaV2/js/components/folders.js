@@ -46,10 +46,12 @@ export const foldersComponent = {
 
     // Drag and drop (snippets) handlers
     button.addEventListener('dragover', (e) => {
+      if (stateService.state.currentPath !== 'snippets') return;
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
     });
     button.addEventListener('drop', (e) => {
+      if (stateService.state.currentPath !== 'snippets') return;
       e.preventDefault();
       const snippetId = e.dataTransfer.getData('text/plain');
       if (!snippetId) return;

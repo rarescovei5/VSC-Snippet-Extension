@@ -3,6 +3,7 @@
 /* Button styles */
 .nav-button,
 .action-button,
+.icon-btn,
 .view-button {
   padding: 10px;
   border-radius: 5px;
@@ -10,7 +11,26 @@
   border: 1px solid transparent;
   transition: background 0.2s;
 }
+.icon-btn {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  border: 1px solid var(--vscode-editorWidget-border);
+  place-content: center;
 
+  border-radius: 5px;
+
+  background: var(--vscode-editorWidget-background);
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+.remove-snippet-button {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+}
 .nav-button,
 .action-button {
   display: flex;

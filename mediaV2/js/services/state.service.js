@@ -49,7 +49,7 @@ export const stateService = {
   removeSnippetFromFolder(folderIdx, snippetId) {
     const folder = this.state.folders[folderIdx];
     folder.snippetIds = folder.snippetIds.filter((id) => id !== snippetId);
-    this._notifyListeners(`folders-${folderIdx}`);
+    this._notifyListeners(`folders-snippets-remove`);
   },
 
   addSnippetToFolder(folderIdx, snippetId) {
@@ -98,6 +98,7 @@ export const stateService = {
   // Observer pattern implementation
   listeners: {},
   subscribe(key, callback) {
+    console.log(key);
     if (!this.listeners[key]) {
       this.listeners[key] = [];
     }
