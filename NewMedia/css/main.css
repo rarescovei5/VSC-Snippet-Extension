@@ -1,0 +1,47 @@
+/* Main CSS entry point for VSCode Snippet Extension */
+
+/*
+This file would normally import all other CSS files,
+but we're using <link> tags in the HTML for better
+visibility of our modular structure.
+
+Structure overview:
+- base.css: Basic resets and core element styling
+- components.css: Individual UI components
+- layout.css: Page structure and positioning
+- utilities.css: Helper classes for common patterns
+*/
+
+/* Additional overrides or one-off styles can be placed here */
+
+/* Ensure sidebar width stays reasonable */
+@media (min-width: 1200px) {
+  .app-sidebar {
+    flex-basis: 300px;
+  }
+}
+
+/* Make sure app looks good on mobile */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+  }
+  .sidebar-navigation {
+    max-height: 100px;
+  }
+
+  .sidebar-header {
+    display: none;
+  }
+
+  .app-sidebar {
+    flex-basis: auto;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--vscode-editorWidget-border);
+  }
+
+  .snippets-container {
+    grid-template-columns: 1fr;
+  }
+}

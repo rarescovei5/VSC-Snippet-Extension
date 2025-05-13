@@ -1,0 +1,90 @@
+/* Layout styles for VSCode Snippet Extension */
+
+/* Main layout structure */
+.app-sidebar {
+  height: 100%;
+  flex-basis: 25%;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--vscode-editorWidget-border);
+}
+
+.app-main {
+  flex: 1;
+  height: 100%;
+}
+
+/* Sidebar sections layout */
+.sidebar-header {
+  padding: 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--vscode-editorWidget-border);
+}
+
+.sidebar-navigation {
+  flex: 1;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow-y: auto;
+  border-bottom: 1px solid var(--vscode-editorWidget-border);
+}
+
+.sidebar-footer {
+  padding: 10px 10px;
+}
+
+/* Main content layout */
+.content-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.content-header {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  gap: 10px;
+  border-bottom: 1px solid var(--vscode-editorWidget-border);
+}
+
+.view-options {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  gap: 10px;
+  border-bottom: 1px solid var(--vscode-editorWidget-border);
+}
+
+/* Snippets container layout */
+.snippets-container {
+  padding: 10px;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-auto-rows: max-content;
+}
+
+/* Hide elements */
+.hidden {
+  display: none;
+}
+
+/* When switching to list view */
+.snippets-container.list-view {
+  display: flex;
+  flex-direction: column;
+}
