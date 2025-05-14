@@ -52,6 +52,7 @@ The extension follows a modular component-based architecture with an observer pa
 ### 📂 File Structure
 
 - **CSS**: Modular approach with separation of concerns
+
   - `base.css`: Core styling elements and variables
   - `components.css`: Individual component styles
   - `layout.css`: Layout and positioning rules
@@ -59,17 +60,20 @@ The extension follows a modular component-based architecture with an observer pa
   - `main.css`: Entry point that imports all styles
 
 - **JavaScript**: ES modules pattern
+
   - `app.js`: Main application entry point
   - **Services**:
     - `state.service.js`: Central state management with observer pattern
     - `api.service.js`: API communication layer
   - **Components**:
+    - `content.js`: Path handling
     - `snippets.js`: Snippet rendering and interactions
     - `folders.js`: Folder management
     - `search.js`: Search functionality
     - `settings.js`: Settings panel operations
   - **Utils**:
     - `dom.js`: DOM manipulation utilities
+    - `state.js`: stateService wrapper functions
 
 - **Assets**:
   - `icons/`: SVG and other icon assets
@@ -80,6 +84,7 @@ The extension follows a modular component-based architecture with an observer pa
 - The `state.service.js` acts as a central store that components observe
 - Components subscribe to state changes and update accordingly
 - This creates a unidirectional data flow:
+
   1. User interactions trigger state changes
   2. State service notifies all subscribers
   3. Components re-render based on new state
@@ -92,7 +97,7 @@ The extension follows a modular component-based architecture with an observer pa
   - A custom name (editable)
   - A list of snippet IDs
   - A delete button
-- Snippets are added via drag-and-drop
+- Snippets are added/removed via drag-and-drop
 - Folder changes persist using `localStorage`
 
 ## 📤 API Endpoints (Backend Required)
