@@ -19,6 +19,11 @@ export const snippetsComponent = {
 
     stateService.subscribe('currentPath', this._handleMount);
     stateService.subscribe('viewMode', () => {
+      if (stateService.state.viewMode === 'grid') {
+        this.snippetsContainer.classList.remove('list-view');
+      } else {
+        this.snippetsContainer.classList.add('list-view');
+      }
       this.snippetsContainer.innerHTML = '';
       this.renderedSnippetsIds.clear();
       this.renderSnippets(stateService.state.snippets);

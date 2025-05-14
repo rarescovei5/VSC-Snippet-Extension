@@ -1,4 +1,3 @@
-import { apiService } from '../services/api.service.js';
 import { stateService } from '../services/state.service.js';
 
 export const settingsComponent = {
@@ -29,6 +28,8 @@ export const settingsComponent = {
     this.exportFoldersBtn.addEventListener('click', () => {
       this._handleExportFolders();
     });
+
+    const radios = this.importStrategyRadios.querySelectorAll('input');
   },
 
   _updateFolderSelectOptions() {

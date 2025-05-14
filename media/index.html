@@ -186,31 +186,33 @@
           <div class="settings-card">
             <h3>Import Folders</h3>
             <p>Import folders from JSON in your clipboard</p>
-            
+
             <div class="settings-content">
-              <div class="import-options" id="import-options" >
+              <div class="import-options" id="import-options">
                 <label class="import-option">
-                  <input type="radio"  value="merge" checked /> 
+                  <input type="radio" name="import-option" value="merge" checked />
                   <span>Merge with existing folders</span>
                 </label>
                 <label class="import-option">
-                  <input type="radio"  value="replace" /> 
+                  <input type="radio" name="import-option" value="replace" />
                   <span>Replace existing folders</span>
                 </label>
               </div>
-              
+
               <div class="settings-action">
-                
-                <button id="import-folders-btn" class="action-button">Import from Clipboard<p class="hint-text">Make sure you have copied a valid JSON to your clipboard</p></button>
+                <button id="import-folders-btn" class="action-button">
+                  Import from Clipboard
+                  <p class="hint-text">Make sure you have copied a valid JSON to your clipboard</p>
+                </button>
               </div>
             </div>
           </div>
-          
+
           <!-- Export Card -->
           <div class="settings-card">
             <h3>Export Folders</h3>
             <p>Export selected folder/folders to your clipboard</p>
-            
+
             <div class="settings-content">
               <div class="folder-select-container">
                 <label for="export-folder-select">Select folder to export:</label>
@@ -219,8 +221,8 @@
                   <!-- Folder options will be populated by JavaScript -->
                 </select>
               </div>
-               
-             <div class="settings-action">
+
+              <div class="settings-action">
                 <button id="export-folders-btn" class="action-button">Copy to Clipboard</button>
               </div>
             </div>

@@ -2,12 +2,10 @@
 
 A powerful and intuitive snippet manager inside your VS Code extension panel. Organize, search, and browse code snippets with ease using folders, tags, and multiple views.
 
----
-
 ## ✨ Features
 
 - 📁 **Folder Management**  
-  Create, rename, and delete folders to organize your snippets.
+  Create, rename, delete, import and export folders to organize your snippets.
 
 - 🔎 **Search and Filter**  
   Filter snippets by title and language, both globally and within folders.
@@ -22,45 +20,71 @@ A powerful and intuitive snippet manager inside your VS Code extension panel. Or
   Drag snippets into folders directly for quick organization.
 
 - ⚙️ **Settings Page**  
-  Switch to the settings tab for future customization options.
+  Switch to the settings tab for extra features.
 
 - 💾 **Persistence**  
   All folder data is saved locally using `localStorage`.
 
----
-
 ## 🧪 Getting Started
 
-1. Clone the repository:
+1. Follow steps on [Principium](github.com/rarescovei5?tab=repositories) repository
+
+2. Clone the repository:
 
    ```bash
    git clone https://github.com/your-username/vscode-snippet-manager.git
    cd vscode-snippet-manager
    ```
 
-2. Install dependencies and open in VS Code:
+3. Install dependencies and open in VS Code:
 
    ```bash
    npm install
    code .
    ```
 
-3. Press `F5` to launch the extension in a new VS Code window.
-
----
+4. Press `F5` to launch the extension in a new VS Code window.
 
 ## 🧠 Architecture Overview
 
-- `SnippetApp` is the main class that handles:
+The extension follows a modular component-based architecture with an observer pattern for state management:
 
-  - State management (`activeViewType`, `searchParams`, `folders`, etc.)
-  - Dynamic UI rendering for snippets and folders
-  - API interactions (`/discover` and `/ids`)
-  - Event bindings for navigation, searching, drag-drop, etc.
+### 📂 File Structure
 
-- Uses VS Code Webview API to interact with frontend UI.
+- **CSS**: Modular approach with separation of concerns
+  - `base.css`: Core styling elements and variables
+  - `components.css`: Individual component styles
+  - `layout.css`: Layout and positioning rules
+  - `utilities.css`: Helper classes
+  - `main.css`: Entry point that imports all styles
 
----
+- **JavaScript**: ES modules pattern
+  - `app.js`: Main application entry point
+  - **Services**:
+    - `state.service.js`: Central state management with observer pattern
+    - `api.service.js`: API communication layer
+  - **Components**:
+    - `snippets.js`: Snippet rendering and interactions
+    - `folders.js`: Folder management
+    - `search.js`: Search functionality
+    - `settings.js`: Settings panel operations
+  - **Utils**:
+    - `dom.js`: DOM manipulation utilities
+
+- **Assets**:
+  - `icons/`: SVG and other icon assets
+  - `vendor/`: Third-party libraries
+
+### 🔄 Observer Pattern Implementation
+
+- The `state.service.js` acts as a central store that components observe
+- Components subscribe to state changes and update accordingly
+- This creates a unidirectional data flow:
+  1. User interactions trigger state changes
+  2. State service notifies all subscribers
+  3. Components re-render based on new state
+
+- Uses VS Code Webview API to interact with the frontend UI
 
 ## 📁 Folder Behavior
 
@@ -71,8 +95,6 @@ A powerful and intuitive snippet manager inside your VS Code extension panel. Or
 - Snippets are added via drag-and-drop
 - Folder changes persist using `localStorage`
 
----
-
 ## 📤 API Endpoints (Backend Required)
 
 - `GET /api/v1/snippets/discover?language=exampleLanguage&title=exampleTitle&page=1&limit=10`  
@@ -81,14 +103,10 @@ A powerful and intuitive snippet manager inside your VS Code extension panel. Or
 - `POST /api/v1/snippets/ids`  
   Accepts an array of IDs to fetch specific snippets (used in folders).
 
----
-
 ## 🛠️ Technologies
 
 - [TypeScript](https://www.typescriptlang.org)
 - [VS Code Extensions API](https://code.visualstudio.com/api)
-
----
 
 ## 🧾 License
 

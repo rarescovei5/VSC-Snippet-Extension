@@ -5,14 +5,25 @@ export const apiService = {
   // VSC Api
   vscode: acquireVsCodeApi(),
   setupMessageListeners(stateService) {
+    const saveState = () => {
+      localStorage.setItem('folders', JSON.stringify(stateService.state.folders));
+    };
+
+    // Handle message from extension
     window.addEventListener('message', (event) => {
       const { type } = event.data;
 
       if (type === 'shutdown') {
-        localStorage.setItem('folders', JSON.stringify(stateService.state.folders));
+        saveState(); // Save when shutdown is triggered from extension
       }
     });
+
+    // Handle webview being closed via the X button
+    window.addEventListener('unload', () => {
+      saveState(); // Save when webview is closed by the user
+    });
   },
+
   postMessage(message) {
     this.vscode.postMessage(message);
   },
