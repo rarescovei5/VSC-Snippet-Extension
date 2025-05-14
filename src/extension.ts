@@ -48,7 +48,7 @@ class SnippetPanel {
     };
     loadHtml();
 
-    this._panel.iconPath = vscode.Uri.joinPath(this._extensionUri, 'media', 'code.svg');
+    this._panel.iconPath = vscode.Uri.joinPath(this._extensionUri, 'media', 'assets', 'icons', 'code.svg');
 
     // Listen for when the panel is disposed
     // This happens when the user closes the panel or when the panel is closed programmatically
