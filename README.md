@@ -27,7 +27,7 @@ A powerful and intuitive snippet manager inside your VS Code extension panel. Or
 
 ## 🧪 Getting Started
 
-1. Follow steps on [Principium](github.com/rarescovei5?tab=repositories) repository
+1. Follow steps on [Principium](https://github.com/rarescovei5/Principium) repository
 
 2. Clone the repository:
 
