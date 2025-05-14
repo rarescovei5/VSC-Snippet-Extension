@@ -88,3 +88,8 @@
   display: flex;
   flex-direction: column;
 }
+
+/* Settings page layout */
+#settings-page {
+ overflow-y: auto;
+}

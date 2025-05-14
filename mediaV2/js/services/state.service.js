@@ -46,6 +46,10 @@ export const stateService = {
     this.state.folders[folderIdx].folderName = newName;
     this._notifyListeners(`folders-${folderIdx}`);
   },
+  modifyFolderSnippets(folderIdx, snippetIds) {
+    this.state.folders[folderIdx].snippetIds = snippetIds;
+    this._notifyListeners('folders');
+  },
   removeSnippetFromFolder(folderIdx, snippetId) {
     const folder = this.state.folders[folderIdx];
     folder.snippetIds = folder.snippetIds.filter((id) => id !== snippetId);
@@ -56,7 +60,6 @@ export const stateService = {
     const folder = this.state.folders[folderIdx];
     if (!folder.snippetIds.includes(snippetId)) {
       folder.snippetIds.push(snippetId);
-      this._notifyListeners(`folders-${folderIdx}`);
       this._notifyListeners('folders');
     }
   },
@@ -98,7 +101,6 @@ export const stateService = {
   // Observer pattern implementation
   listeners: {},
   subscribe(key, callback) {
-    console.log(key);
     if (!this.listeners[key]) {
       this.listeners[key] = [];
     }

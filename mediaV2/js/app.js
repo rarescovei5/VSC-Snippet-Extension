@@ -5,6 +5,7 @@ import { snippetsComponent } from './components/snippets.js';
 import { redirectTo } from './utils/state.js';
 import { apiService } from './services/api.service.js';
 import { stateService } from './services/state.service.js';
+import { settingsComponent } from './components/settings.js';
 
 (function () {
   const addEventListeners = () => {
@@ -19,6 +20,7 @@ import { stateService } from './services/state.service.js';
     foldersComponent.init();
     searchComponent.init();
     snippetsComponent.init();
+    settingsComponent.init();
   };
 
   const initializeApp = () => {
