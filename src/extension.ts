@@ -1,3 +1,9 @@
+// Load .env from root
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
+
+// VSC Extension
 import * as vscode from 'vscode';
 
 // ---------------------- Extension Logic ----------------------
@@ -47,6 +53,14 @@ class SnippetPanel {
       this._panel.webview.html = await this._getHtml();
     };
     loadHtml();
+
+    // Send the API Path
+    this._panel.webview.postMessage({
+      type: 'env',
+      data: {
+        API_BASE_URL: process.env.API_BASE_URL || '',
+      },
+    });
 
     this._panel.iconPath = vscode.Uri.joinPath(this._extensionUri, 'media', 'assets', 'icons', 'code.svg');
 

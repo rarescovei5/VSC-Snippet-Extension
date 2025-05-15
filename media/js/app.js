@@ -27,7 +27,6 @@ import { settingsComponent } from './components/settings.js';
     apiService.setupMessageListeners(stateService);
     addEventListeners();
     initializeComponents();
-    redirectTo('snippets');
   };
 
   initializeApp();

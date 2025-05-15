@@ -1,4 +1,5 @@
 import { searchComponent } from '../components/search.js';
+import { redirectTo } from '../utils/state.js';
 import { stateService } from './state.service.js';
 
 export const apiService = {
@@ -11,10 +12,13 @@ export const apiService = {
 
     // Handle message from extension
     window.addEventListener('message', (event) => {
-      const { type } = event.data;
+      const { type, data } = event.data;
 
       if (type === 'shutdown') {
-        saveState(); // Save when shutdown is triggered from extension
+        saveState();
+      } else if (type === 'env') {
+        this.baseUrl = data.API_BASE_URL;
+        redirectTo('snippets');
       }
     });
 
@@ -29,8 +33,9 @@ export const apiService = {
   },
 
   // Principium API
-  baseUrl: 'http://localhost:3000',
+  baseUrl: undefined,
   async getDiscoverSnippets(page = 1) {
+    if (!this.baseUrl) return;
     try {
       const queryParams = new URLSearchParams({
         page,
@@ -53,6 +58,7 @@ export const apiService = {
     }
   },
   async getSnippetsByIds(folderId) {
+    if (!this.baseUrl) return;
     const folder = stateService.state.folders[folderId];
     if (!folder) {
       return [];
