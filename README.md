@@ -27,23 +27,21 @@ A powerful and intuitive snippet manager inside your VS Code extension panel. Or
 
 ## 🧪 Getting Started
 
-1. Follow steps on [Principium](https://github.com/rarescovei5/Principium) repository
-
-2. Clone the repository:
+1. Clone the repository:
 
    ```bash
    git clone https://github.com/your-username/vscode-snippet-manager.git
    cd vscode-snippet-manager
    ```
 
-3. Install dependencies and open in VS Code:
+2. Install dependencies and open in VS Code:
 
    ```bash
    npm install
    code .
    ```
 
-4. Press `F5` to launch the extension in a new VS Code window.
+3. Press `F5` to launch the extension in a new VS Code window.
 
 ## 🧠 Architecture Overview
 
@@ -101,12 +99,14 @@ The extension follows a modular component-based architecture with an observer pa
 - Folder changes persist using `localStorage`
 
 ## 📤 API Endpoints (Backend Required)
+#### See the logic behind these paths: [Principium-API](https://github.com/rarescovei5/Principium-API/blob/main/src/routes/snippetRouter.ts)
 
 - `GET /api/v1/snippets/discover?language=exampleLanguage&title=exampleTitle&page=1&limit=10`  
   Returns paginated snippets for the discover view.
 
 - `POST /api/v1/snippets/ids`  
   Accepts an array of IDs to fetch specific snippets (used in folders).
+
 
 ## 🛠️ Technologies
 
