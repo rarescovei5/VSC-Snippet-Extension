@@ -1,118 +1,71 @@
-# 📚 Snippet Manager for VS Code
+# code-snippets README
 
-A powerful and intuitive snippet manager inside your VS Code extension panel. Organize, search, and browse code snippets with ease using folders, tags, and multiple views.
+This is the README for your extension "code-snippets". After writing up a brief description, we recommend including the following sections.
 
-## ✨ Features
+## Features
 
-- 📁 **Folder Management**  
-  Create, rename, delete, import and export folders to organize your snippets.
+Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
 
-- 🔎 **Search and Filter**  
-  Filter snippets by title and language, both globally and within folders.
+For example if there is an image subfolder under your extension project workspace:
 
-- 🌐 **Infinite Scroll**  
-  Seamlessly load more snippets as you scroll.
+\!\[feature X\]\(images/feature-x.png\)
 
-- 🗃️ **Grid & List Views**  
-  Toggle between a compact grid or detailed list display.
+> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
-- 🧩 **Drag and Drop**  
-  Drag snippets into folders directly for quick organization.
+## Requirements
 
-- ⚙️ **Settings Page**  
-  Switch to the settings tab for extra features.
+If you have any requirements or dependencies, add a section describing those and how to install and configure them.
 
-- 💾 **Persistence**  
-  All folder data is saved locally using `localStorage`.
+## Extension Settings
 
-## 🧪 Getting Started
+Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
 
-1. Clone the repository:
+For example:
 
-   ```bash
-   git clone https://github.com/your-username/vscode-snippet-manager.git
-   cd vscode-snippet-manager
-   ```
+This extension contributes the following settings:
 
-2. Install dependencies and open in VS Code:
+* `myExtension.enable`: Enable/disable this extension.
+* `myExtension.thing`: Set to `blah` to do something.
 
-   ```bash
-   npm install
-   code .
-   ```
+## Known Issues
 
-3. Press `F5` to launch the extension in a new VS Code window.
+Calling out known issues can help limit users opening duplicate issues against your extension.
 
-## 🧠 Architecture Overview
+## Release Notes
 
-The extension follows a modular component-based architecture with an observer pattern for state management:
+Users appreciate release notes as you update your extension.
 
-### 📂 File Structure
+### 1.0.0
 
-- **CSS**: Modular approach with separation of concerns
+Initial release of ...
 
-  - `base.css`: Core styling elements and variables
-  - `components.css`: Individual component styles
-  - `layout.css`: Layout and positioning rules
-  - `utilities.css`: Helper classes
-  - `main.css`: Entry point that imports all styles
+### 1.0.1
 
-- **JavaScript**: ES modules pattern
+Fixed issue #.
 
-  - `app.js`: Main application entry point
-  - **Services**:
-    - `state.service.js`: Central state management with observer pattern
-    - `api.service.js`: API communication layer
-  - **Components**:
-    - `content.js`: Path handling
-    - `snippets.js`: Snippet rendering and interactions
-    - `folders.js`: Folder management
-    - `search.js`: Search functionality
-    - `settings.js`: Settings panel operations
-  - **Utils**:
-    - `dom.js`: DOM manipulation utilities
-    - `state.js`: stateService wrapper functions
+### 1.1.0
 
-- **Assets**:
-  - `icons/`: SVG and other icon assets
-  - `vendor/`: Third-party libraries
+Added features X, Y, and Z.
 
-### 🔄 Observer Pattern Implementation
+---
 
-- The `state.service.js` acts as a central store that components observe
-- Components subscribe to state changes and update accordingly
-- This creates a unidirectional data flow:
+## Following extension guidelines
 
-  1. User interactions trigger state changes
-  2. State service notifies all subscribers
-  3. Components re-render based on new state
+Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
 
-- Uses VS Code Webview API to interact with the frontend UI
+* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
 
-## 📁 Folder Behavior
+## Working with Markdown
 
-- Each folder has:
-  - A custom name (editable)
-  - A list of snippet IDs
-  - A delete button
-- Snippets are added/removed via drag-and-drop
-- Folder changes persist using `localStorage`
+You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
 
-## 📤 API Endpoints (Backend Required)
-#### See the logic behind these paths: [Principium-API](https://github.com/rarescovei5/Principium-API/blob/main/src/routes/snippetRouter.ts)
+* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
+* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
+* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
 
-- `GET /api/v1/snippets/discover?language=exampleLanguage&title=exampleTitle&page=1&limit=10`  
-  Returns paginated snippets for the discover view.
+## For more information
 
-- `POST /api/v1/snippets/ids`  
-  Accepts an array of IDs to fetch specific snippets (used in folders).
+* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
+* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
 
-
-## 🛠️ Technologies
-
-- [TypeScript](https://www.typescriptlang.org)
-- [VS Code Extensions API](https://code.visualstudio.com/api)
-
-## 🧾 License
-
-MIT © Principium Studios
+**Enjoy!**
