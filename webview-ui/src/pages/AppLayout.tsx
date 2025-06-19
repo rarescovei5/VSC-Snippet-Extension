@@ -1,4 +1,4 @@
-import { VscCode, VscFiles, VscGear } from 'react-icons/vsc';
+import { VscCode, VscGear, VscSymbolFile } from 'react-icons/vsc';
 import { Link, Outlet } from '../ContextRouter';
 import { useRouter } from '../ContextRouter/utilities/useRouter';
 
@@ -9,17 +9,17 @@ const AppLayout = () => {
     <div className="h-svh flex justify-between bg-background">
       <aside className="flex flex-col h-full flex-1/4 border-r border-border">
         <div className="flex p-4 border-b border-border gap-2 items-center text-xl font-medium !text-text">
-          <VscCode size={24} />
+          <VscCode size={16} />
           <h1>Code Snippets</h1>
         </div>
-        <div className="flex-1 flex p-1 border-b border-border gap-2 flex-col">
+        <div className="flex-1 flex p-1 border-b border-border gap-2 flex-col overflow-y-auto">
           <Link
             to="/settings"
             className={`flex gap-2 items-center cursor-pointer rounded-sm border text-base !text-text p-3 ${
               path === '/settings' ? 'bg-card border-border' : 'border-transparent hover:bg-card/50'
             }`}
           >
-            <VscGear size={24} />
+            <VscGear size={16} />
             <span>Settings</span>
           </Link>
           <Link
@@ -28,7 +28,7 @@ const AppLayout = () => {
               path === '/' ? 'bg-card border-border' : 'border-transparent hover:bg-card/50'
             }`}
           >
-            <VscFiles size={24} />
+            <VscSymbolFile size={16} />
             <span>Snippets</span>
           </Link>
         </div>
