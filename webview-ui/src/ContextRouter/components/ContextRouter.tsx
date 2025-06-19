@@ -10,12 +10,12 @@ interface PathContextType {
 
 export const PathContext = React.createContext<PathContextType | null>(null);
 
-export interface BrowserRouterProps {
+export interface ContextRouterProps {
   basePath?: Path;
   children?: React.ReactElement<RoutesProps>;
 }
 
-const BrowserRouter = (props: BrowserRouterProps) => {
+const ContextRouter = (props: ContextRouterProps) => {
   const [path, setPath] = React.useState(props.basePath ?? '/');
   const value = React.useMemo(() => ({ path, navigate: setPath }), [path]);
 
@@ -24,4 +24,4 @@ const BrowserRouter = (props: BrowserRouterProps) => {
   return <PathContext value={value}>{props.children}</PathContext>;
 };
 
-export default BrowserRouter;
+export default ContextRouter;

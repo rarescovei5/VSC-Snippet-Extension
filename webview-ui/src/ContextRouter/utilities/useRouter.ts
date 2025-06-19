@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { PathContext } from '../components/BrowserRouter';
+import { PathContext } from '../components/ContextRouter';
 
 /// Uses PathContext and returns the result
 export const useRouter = () => {
