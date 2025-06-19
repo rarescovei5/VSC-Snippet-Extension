@@ -1,12 +1,12 @@
 import React from 'react';
-import { RouteProps } from '../utilities/validRoutes';
+import type { Path } from '../types';
 
-interface RouteProps {
-  path: string;
+export interface RouteProps {
+  path: Path;
   children: React.ReactElement<RouteProps> | React.ReactElement<RouteProps>[];
 }
 
-const Route = () => {
+const Route = (props: RouteProps) => {
   return <div></div>;
 };
 
