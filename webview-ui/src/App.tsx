@@ -1,4 +1,4 @@
-import BrowserRouter from './Fake Router/components/BrowserRouter';
+import { BrowserRouter, Routes } from './ContextRouter';
 
 function App() {
   return (

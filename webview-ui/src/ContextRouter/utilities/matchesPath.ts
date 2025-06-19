@@ -1,60 +1,42 @@
 /**
- * Matches a URL path against a route path pattern
- * 
- * @param currentPath - The current URL path (e.g., '/users/123')
- * @param routePath - The route path pattern (e.g., '/users/:id')
- * @returns boolean indicating if the paths match
- * 
- * @example
- * // Exact match
- * matchesPath('/users', '/users'); // true
- * 
- * // Parameter match
- * matchesPath('/users/123', '/users/:id'); // true
- * 
- * // Wildcard match
- * matchesPath('/any/path', '*'); // true
+ * Check if a given path matches a route pattern.
+ *
+ * Supports:
+ * - Exact routes:       "/users" <=> "/users"
+ * - Parameters:         "/users/123" <=> "/users/:id"
+ * - Global wildcard:    "/any/thing" <=> "*"
+ * - Suffix wildcard:    "/foo/bar/baz" <=> "/foo/bar/*"
+ *
+ * @param path - The actual path (e.g. "/users/123")
+ * @param pattern - The route pattern (e.g. "/users/:id" or "/foo/*")
+ * @returns true if they match
  */
-export function matchesPath(currentPath: string, routePath: string): boolean {
-  // Handle wildcard route
-  if (routePath === '*') {
-    return true;
+export function matchesPath(path: string, pattern: string): boolean {
+  // Global wildcard
+  if (pattern === '*') return true;
+
+  // Normalize into segments, ignoring leading/trailing slashes
+  const segs = (s: string) => s.split('/').filter(Boolean);
+  const pathSegs = segs(path);
+  const patternSegs = segs(pattern);
+
+  // Handle suffix wildcard (last segment is "*")
+  const hasSuffixWildcard = patternSegs[patternSegs.length - 1] === '*';
+  if (hasSuffixWildcard) {
+    const base = patternSegs.slice(0, -1);
+    // path must start with base
+    return base.every((seg, i) => seg.startsWith(':') || pathSegs[i] === seg);
   }
 
-  // Handle exact match
-  if (currentPath === routePath) {
-    return true;
+  // Must have same number of segments otherwise
+  if (pathSegs.length !== patternSegs.length) return false;
+
+  // Per-segment match: either exact or a parameter
+  for (let i = 0; i < patternSegs.length; i++) {
+    const p = patternSegs[i];
+    if (p.startsWith(':')) continue;
+    if (p !== pathSegs[i]) return false;
   }
-
-  // Normalize paths by removing leading/trailing slashes
-  const normalize = (path: string) => 
-    path.split('/').filter(Boolean);
-
-  const currentSegments = normalize(currentPath);
-  const routeSegments = normalize(routePath);
-
-  // Different number of segments can't match
-  if (currentSegments.length !== routeSegments.length) {
-    return false;
-  }
-
-  // Check each segment
-  for (let i = 0; i < routeSegments.length; i++) {
-    const routeSegment = routeSegments[i];
-    const currentSegment = currentSegments[i];
-
-    // Parameter segment (starts with ':')
-    if (routeSegment.startsWith(':')) {
-      continue; // Any value is acceptable
-    }
-
-    
-    // Exact segment match required
-    if (routeSegment !== currentSegment) {
-      return false;
-    }
-  }
-
 
   return true;
 }
