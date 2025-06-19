@@ -1,5 +1,5 @@
 const SnippetsPage = () => {
-  return <div></div>;
+  return <div>Snippets</div>;
 };
 
 export default SnippetsPage;

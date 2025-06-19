@@ -10,11 +10,10 @@ const Outlet = () => {
 
   if (!routeCtx?.children) return null;
 
-  console.log('Outlet Print: ', path);
-
-  const matchingRoute = React.Children.toArray(routeCtx.children).filter(
-    (child) => React.isValidElement<RouteProps>(child) && matchesPath(path, '/*' + child.props.path)
-  );
+  const matchingRoute = React.Children.toArray(routeCtx.children).filter((child) => {
+    if (!React.isValidElement<RouteProps>(child)) return false;
+    return matchesPath(path, routeCtx.pattern + child.props.path);
+  });
 
   return matchingRoute[0] ?? null;
 };
