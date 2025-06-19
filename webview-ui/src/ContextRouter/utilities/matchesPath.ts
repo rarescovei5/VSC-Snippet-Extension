@@ -3,40 +3,74 @@
  *
  * Supports:
  * - Exact routes:       "/users" <=> "/users"
- * - Parameters:         "/users/123" <=> "/users/:id"
- * - Global wildcard:    "/any/thing" <=> "*"
- * - Suffix wildcard:    "/foo/bar/baz" <=> "/foo/bar/*"
+ * - Parameters:         "/users/`123`" <=> "/users/`:id`"
+ * - Wildcards:          "/`*`\/foo/bar/`*`" <=> "/`fizz/buzz`/foo/bar/`capucino/asasino`"
+ *
  *
  * @param path - The actual path (e.g. "/users/123")
  * @param pattern - The route pattern (e.g. "/users/:id" or "/foo/*")
  * @returns true if they match
  */
 export function matchesPath(path: string, pattern: string): boolean {
-  // Global wildcard
+  // Global wildcard matches anything
   if (pattern === '*') return true;
 
-  // Normalize into segments, ignoring leading/trailing slashes
-  const segs = (s: string) => s.split('/').filter(Boolean);
-  const pathSegs = segs(path);
-  const patternSegs = segs(pattern);
+  // Split a string into non-empty segments
+  const splitSegments = (input: string) => input.split('/').filter(Boolean);
+  const pathSegments = splitSegments(path);
+  const patternSegments = splitSegments(pattern);
 
-  // Handle suffix wildcard (last segment is "*")
-  const hasSuffixWildcard = patternSegs[patternSegs.length - 1] === '*';
-  if (hasSuffixWildcard) {
-    const base = patternSegs.slice(0, -1);
-    // path must start with base
-    return base.every((seg, i) => seg.startsWith(':') || pathSegs[i] === seg);
+  // Pointers for walking the path and pattern
+  let pathIndex = 0;
+  let patternIndex = 0;
+
+  // Remember positions for backtracking when we hit a '*'
+  let lastStarPatternIndex = -1;
+  let lastStarPathIndex = -1;
+
+  /// "/*/foo/bar/*" <=> "/fizz/buzz/foo/bar/capucino/asasino"
+  // Walk through the path segments
+  while (pathIndex < pathSegments.length) {
+    const currentPatternSegment = patternSegments[patternIndex];
+
+    // Handle wildcard segment
+    if (currentPatternSegment === '*') {
+      // Record where the '*' was seen
+      lastStarPatternIndex = patternIndex;
+      lastStarPathIndex = pathIndex;
+      // Move past '*' in the pattern
+      patternIndex++;
+      continue;
+    }
+
+    // Match parameter segment (e.g. ":id") or exact segment
+    const currentPathSegment = pathSegments[pathIndex];
+    const isParameter = currentPatternSegment?.startsWith(':');
+
+    if (patternIndex < patternSegments.length && (isParameter || currentPatternSegment === currentPathSegment)) {
+      // Advance both pointers on match
+      patternIndex++;
+      pathIndex++;
+      continue;
+    }
+
+    // If mismatch and there was a previous '*', backtrack
+    if (lastStarPatternIndex !== -1) {
+      // Try to match one more segment with the last '*'
+      patternIndex = lastStarPatternIndex + 1;
+      pathIndex = ++lastStarPathIndex;
+      continue;
+    }
+
+    // No wildcard to backtrack to, and segments don't match
+    return false;
   }
 
-  // Must have same number of segments otherwise
-  if (pathSegs.length !== patternSegs.length) return false;
-
-  // Per-segment match: either exact or a parameter
-  for (let i = 0; i < patternSegs.length; i++) {
-    const p = patternSegs[i];
-    if (p.startsWith(':')) continue;
-    if (p !== pathSegs[i]) return false;
+  // Skip any trailing '*' in the pattern (e.g. /users/*/*/*/*)
+  while (patternIndex < patternSegments.length && patternSegments[patternIndex] === '*') {
+    patternIndex++;
   }
 
-  return true;
+  // Only a match if we've consumed the entire pattern
+  return patternIndex === patternSegments.length;
 }

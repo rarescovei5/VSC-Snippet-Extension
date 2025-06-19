@@ -21,7 +21,7 @@ const BrowserRouter = (props: BrowserRouterProps) => {
 
   if (!isChildrenRoutes(props.children)) return null;
 
-  return <PathContext value={value}></PathContext>;
+  return <PathContext value={value}>{props.children}</PathContext>;
 };
 
 export default BrowserRouter;
