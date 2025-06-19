@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { PathContext } from '../components/BrowserRouter';
 
 /// Uses PathContext and returns the result
-const usePath = () => {
+export const useRouter = () => {
   const context = useContext(PathContext);
 
   if (!context) {
@@ -11,5 +11,3 @@ const usePath = () => {
 
   return context;
 };
-
-export default usePath;

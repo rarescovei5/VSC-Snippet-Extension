@@ -1,17 +1,17 @@
 import React from 'react';
 import type { Path } from '../types';
-import usePath from '../utilities/usePath';
+import { useRouter } from '../utilities/useRouter';
 
 export type LinkProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & { to: Path };
 
 const Link = (props: LinkProps) => {
-  const { onPathChange } = usePath();
+  const { navigate } = useRouter();
   return (
     <a
       {...props}
       onClick={(e) => {
         e.preventDefault();
-        onPathChange(props.to);
+        navigate(props.to);
       }}
     />
   );
