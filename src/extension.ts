@@ -17,6 +17,13 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
+  context.subscriptions.push(
+    vscode.commands.registerCommand('code-snippets.refresh', () => {
+      WebviewPanel.currentPanel?.dispose();
+      WebviewPanel.currentPanel = undefined;
+    })
+  );
+
   context.subscriptions.push(sBarButton);
 }
 

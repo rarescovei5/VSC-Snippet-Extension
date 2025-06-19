@@ -1,5 +1,11 @@
+import BrowserRouter from './Fake Router/components/BrowserRouter';
+
 function App() {
-  return <></>;
+  return (
+    <BrowserRouter>
+      <Routes></Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;
