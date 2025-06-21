@@ -2,38 +2,69 @@ import React from 'react';
 import { VscChevronDown, VscClose, VscLoading, VscSearch, VscSearchStop } from 'react-icons/vsc';
 import { axiosInstance } from '../api';
 import type { Snippet } from '../types/types';
+import SnippetCard from '../components/SnippetCard';
 
+const languageOptions = [
+  ['', 'All Languages'],
+  ['c', 'C'],
+  ['cpp', 'C++'],
+  ['csharp', 'C#'],
+  ['css', 'CSS'],
+  ['go', 'Go'],
+  ['java', 'Java'],
+  ['javascript', 'JavaScript'],
+  ['json', 'JSON'],
+  ['kotlin', 'Kotlin'],
+  ['lua', 'Lua'],
+  ['php', 'PHP'],
+  ['python', 'Python'],
+  ['ruby', 'Ruby'],
+  ['rust', 'Rust'],
+  ['sql', 'SQL'],
+  ['swift', 'Swift'],
+  ['typescript', 'TypeScript'],
+  ['xml', 'XML'],
+];
 interface LanguageSelectProps {
   language: string;
   setLanguage: React.Dispatch<React.SetStateAction<string>>;
 }
 const LanguageSelect = (props: LanguageSelectProps) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  const [displayed, setDisplayed] = React.useState('All Languages');
+
+  const handleClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    // look for the nearest child DIV that carries your data‑value
+    const el = (e.target as HTMLElement).closest<HTMLDivElement>('[data-value]');
+    if (!el) return;
+    props.setLanguage(el.dataset.value!);
+    setDisplayed((e.target as HTMLElement).innerText);
+    setIsOpen(false);
+  };
+
   return (
-    <div className="!text-text">
-      <button className="p-3 bg-card border border-border rounded-sm flex gap-2 items-center cursor-pointer">
-        <span>{props.language}</span> <VscChevronDown />
+    <div className="!text-text relative">
+      <button
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="p-3 min-w-50 bg-card border border-border rounded-sm flex gap-2 items-center cursor-pointer"
+      >
+        <span className="flex-1 text-left">{displayed}</span> <VscChevronDown />
       </button>
-      <div className="hidden">
-        <div data-value="c">C</div>
-        <div data-value="cpp">C++</div>
-        <div data-value="csharp">C#</div>
-        <div data-value="css">CSS</div>
-        <div data-value="go">Go</div>
-        <div data-value="java">Java</div>
-        <div data-value="javascript">JavaScript</div>
-        <div data-value="json">JSON</div>
-        <div data-value="kotlin">Kotlin</div>
-        <div data-value="lua">Lua</div>
-        <div data-value="php">PHP</div>
-        <div data-value="powershell">PowerShell</div>
-        <div data-value="python">Python</div>
-        <div data-value="ruby">Ruby</div>
-        <div data-value="rust">Rust</div>
-        <div data-value="sql">SQL</div>
-        <div data-value="swift">Swift</div>
-        <div data-value="typescript">TypeScript</div>
-        <div data-value="xml">XML</div>
-      </div>
+      {isOpen && (
+        <div className="z-10 absolute w-full right-0 top-[110%] bg-card border border-border rounded-sm flex flex-col">
+          {languageOptions.map(([value, label]) => (
+            <div
+              onClick={handleClick}
+              key={value || 'all'}
+              data-value={value}
+              className={`cursor-pointer px-3 py-1 ${props.language === value ? 'bg-text/20' : 'hover:bg-text/10'}`}
+            >
+              {label}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -69,9 +100,9 @@ const TitleSearchbar = (props: TitleSearchbarProps) => {
 
 const SnippetsPage = () => {
   const [titleQuery, setTitleQuery] = React.useState('');
-  const [selectedLanguage, setSelectedLangauge] = React.useState('All Languages');
+  const [selectedLanguage, setSelectedLangauge] = React.useState('');
 
-  const [snippets, setSnippets] = React.useState<Snippet[]>([]);
+  const [snippets, setSnippets] = React.useState<Snippet[][]>([]);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [totalPages, setTotalPages] = React.useState(1);
 
@@ -87,12 +118,20 @@ const SnippetsPage = () => {
       startTransition(async () => {
         const res = await axiosInstance.get(
           `/public/snippets?${
-            selectedLanguage !== 'All Languages' ? `language=${selectedLanguage}&` : ''
+            selectedLanguage !== '' ? `language=${selectedLanguage}&` : ''
           }title=${titleQuery}&page=${currentPage}&limit=10`
         );
         const data = res.data;
         setTotalPages(data.total_pages);
-        setSnippets(data.records);
+        if (currentPage === 1) {
+          setSnippets([data.records]);
+        } else {
+          setSnippets((prev) => {
+            let prevCopy = prev;
+            prevCopy.push(data.records);
+            return prevCopy;
+          });
+        }
       });
     }, 250);
 
@@ -105,29 +144,54 @@ const SnippetsPage = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="p-1 border-b border-border flex gap-4">
+      {/* Toolbar (search + filter) */}
+      <header className="p-1 border-b border-border flex gap-4">
         <TitleSearchbar title={titleQuery} setTitle={setTitleQuery} />
         <LanguageSelect language={selectedLanguage} setLanguage={setSelectedLangauge} />
-      </div>
-      <div className="relative flex-1">
-        {isPending ? (
+      </header>
+
+      {/* Results Area */}
+      {isPending ? (
+        <section className="flex-1 relative">
           <VscLoading
             size={48}
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 !text-text animate-spin"
           />
-        ) : totalPages === 0 ? (
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 !text-text flex flex-col items-center">
+        </section>
+      ) : totalPages === 0 ? (
+        <section className="flex-1 relative">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 !text-text flex flex-col items-center text-center">
             <VscSearchStop size={48} className="mb-4" />
             <h1 className="text-2xl font-medium">No Snippets Found!</h1>
             <p className="text-text-muted mt-1 text-sm">Try adjusting your filters</p>
           </div>
-        ) : (
-          <></>
-        )}
-        <span className="z-10 absolute right-4 bottom-4 !text-text font-bold">
-          {isPending || totalPages === 0 ? '' : currentPage + '/' + totalPages}
-        </span>
-      </div>
+        </section>
+      ) : (
+        <section
+          style={{
+            gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+            gridAutoRows: 'max-content',
+          }}
+          className="flex-1 grid gap-1 p-1 overflow-y-auto"
+        >
+          {snippets.map((snippetsPage) => {
+            return snippetsPage.map((snippet) => {
+              return (
+                <SnippetCard
+                  key={snippet.id}
+                  language={snippet.language}
+                  title={snippet.title}
+                  tags={snippet.tags}
+                  description={snippet.description ?? ''}
+                  code={snippet.code ?? ''}
+                  stars={snippet.stars}
+                />
+              );
+            });
+          })}
+          <span className="!text-text font-bold col-span-full my-2 text-center">{currentPage + '/' + totalPages}</span>
+        </section>
+      )}
     </div>
   );
 };
