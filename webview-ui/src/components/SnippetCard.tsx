@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaCss3, FaJava } from 'react-icons/fa';
-import { LuFileJson } from 'react-icons/lu';
+import { LuFileCode, LuFileJson } from 'react-icons/lu';
 import {
   SiC,
   SiCplusplus,
@@ -53,7 +53,7 @@ interface SnippetCardProps {
 }
 
 const SnippetCard = (props: SnippetCardProps) => {
-  const LangIcon = iconMap[props.language.toLowerCase()];
+  const LangIcon = iconMap[props.language.toLowerCase()] || LuFileCode;
   return (
     <div className="bg-card p-3 flex flex-col justify-between gap-4 rounded-sm border border-border">
       {/* Header  */}
@@ -63,8 +63,10 @@ const SnippetCard = (props: SnippetCardProps) => {
           <h3 className="text-base">{props.title}</h3>
         </div>
         <div className="flex gap-2 overflow-x-auto">
-          {props.tags.map((tag) => (
-            <span className="bg-border px-2 bg rounded-sm">{tag}</span>
+          {props.tags.map((tag, index) => (
+            <span key={index} className="bg-border px-2 bg rounded-sm">
+              {tag}
+            </span>
           ))}
         </div>
         <p className="!text-text">{props.description}</p>
@@ -77,8 +79,9 @@ const SnippetCard = (props: SnippetCardProps) => {
           fontSize: '0.9rem',
           fontFamily: 'Fira Code, Consolas, Menlo, monospace',
           margin: 0,
-          padding: '1rem',
+          padding: '0.75rem',
           background: 'var(--vscode-panel-border)',
+          borderRadius: '0.25rem',
         }}
         style={atomOneDark}
       >
@@ -104,4 +107,4 @@ const SnippetCard = (props: SnippetCardProps) => {
   );
 };
 
-export default SnippetCard;
+export default React.memo(SnippetCard);

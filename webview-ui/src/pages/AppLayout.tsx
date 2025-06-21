@@ -6,7 +6,7 @@ const AppLayout = () => {
   const { path } = useRouter();
 
   return (
-    <div className="h-svh flex justify-between bg-background">
+    <div className="h-svh flex justify-between bg-background overflow-hidden">
       <aside className="flex flex-col h-full flex-1/4 border-r border-border">
         <div className="flex p-4 border-b border-border gap-2 items-center text-xl font-medium !text-text">
           <VscCode size={16} />
