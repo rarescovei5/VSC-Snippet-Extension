@@ -21,6 +21,7 @@ import { TbBrandCSharp } from 'react-icons/tb';
 import { VscStarFull } from 'react-icons/vsc';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { useAppSelector } from '../app/hooks';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   c: SiC,
@@ -53,7 +54,10 @@ interface SnippetCardProps {
 }
 
 const SnippetCard = (props: SnippetCardProps) => {
+  const { showLineNumbers } = useAppSelector((state) => state.settingsReducer.appearance);
+
   const LangIcon = iconMap[props.language.toLowerCase()] || LuFileCode;
+
   return (
     <div className="bg-card p-3 flex flex-col justify-between gap-4 rounded-sm border border-border">
       {/* Header  */}
@@ -82,7 +86,9 @@ const SnippetCard = (props: SnippetCardProps) => {
           padding: '0.75rem',
           background: 'var(--vscode-panel-border)',
           borderRadius: '0.25rem',
+          maxHeight: '250px',
         }}
+        showLineNumbers={showLineNumbers}
         style={atomOneDark}
       >
         {props.code}

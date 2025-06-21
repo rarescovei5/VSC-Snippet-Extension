@@ -1,102 +1,11 @@
 import React from 'react';
-import { VscChevronDown, VscClose, VscLoading, VscSearch, VscSearchStop } from 'react-icons/vsc';
+import { VscLoading, VscSearchStop } from 'react-icons/vsc';
 import { axiosInstance } from '../api';
 import type { Snippet } from '../types/types';
 import SnippetCard from '../components/SnippetCard';
-
-const languageOptions = [
-  ['', 'All Languages'],
-  ['c', 'C'],
-  ['cpp', 'C++'],
-  ['csharp', 'C#'],
-  ['css', 'CSS'],
-  ['go', 'Go'],
-  ['java', 'Java'],
-  ['javascript', 'JavaScript'],
-  ['json', 'JSON'],
-  ['kotlin', 'Kotlin'],
-  ['lua', 'Lua'],
-  ['php', 'PHP'],
-  ['python', 'Python'],
-  ['ruby', 'Ruby'],
-  ['rust', 'Rust'],
-  ['sql', 'SQL'],
-  ['swift', 'Swift'],
-  ['typescript', 'TypeScript'],
-  ['xml', 'XML'],
-];
-interface LanguageSelectProps {
-  language: string;
-  setLanguage: React.Dispatch<React.SetStateAction<string>>;
-}
-const LanguageSelect = (props: LanguageSelectProps) => {
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  const [displayed, setDisplayed] = React.useState('All Languages');
-
-  const handleClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    // look for the nearest child DIV that carries your data‑value
-    const el = (e.target as HTMLElement).closest<HTMLDivElement>('[data-value]');
-    if (!el) return;
-    props.setLanguage(el.dataset.value!);
-    setDisplayed((e.target as HTMLElement).innerText);
-    setIsOpen(false);
-  };
-
-  return (
-    <div className="!text-text relative">
-      <button
-        onClick={() => setIsOpen((prev) => !prev)}
-        className="p-3 min-w-50 bg-card border border-border rounded-sm flex gap-2 items-center cursor-pointer"
-      >
-        <span className="flex-1 text-left">{displayed}</span> <VscChevronDown />
-      </button>
-      {isOpen && (
-        <div className="z-10 absolute w-full right-0 top-[110%] bg-card border border-border rounded-sm flex flex-col">
-          {languageOptions.map(([value, label]) => (
-            <div
-              onClick={handleClick}
-              key={value || 'all'}
-              data-value={value}
-              className={`cursor-pointer px-3 py-1 ${props.language === value ? 'bg-text/20' : 'hover:bg-text/10'}`}
-            >
-              {label}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-interface TitleSearchbarProps {
-  title: string;
-  setTitle: React.Dispatch<React.SetStateAction<string>>;
-}
-const TitleSearchbar = (props: TitleSearchbarProps) => {
-  return (
-    <div className="!text-text relative flex-1">
-      <input
-        className="w-full h-full p-3 rounded-sm bg-card border border-border pr-8 outline-none"
-        type="text"
-        placeholder="Search..."
-        value={props.title}
-        onChange={(e) => {
-          props.setTitle(e.target.value);
-        }}
-      />
-      {!props.title.length ? (
-        <VscSearch size={16} className="absolute right-4 top-1/2 -translate-y-1/2" />
-      ) : (
-        <VscClose
-          size={16}
-          className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
-          onClick={() => props.setTitle('')}
-        />
-      )}
-    </div>
-  );
-};
+import { useAppSelector } from '../app/hooks';
+import LanguageSelect from '../components/LanguageSelect';
+import TitleSearchbar from '../components/TitleSearchbar';
 
 const gridStyles = {
   gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
@@ -104,6 +13,8 @@ const gridStyles = {
 };
 
 const SnippetsPage = () => {
+  const pageSize = useAppSelector((state) => state.settingsReducer.apiConfig.pageSize);
+
   const [titleQuery, setTitleQuery] = React.useState('');
   const [selectedLanguage, setSelectedLangauge] = React.useState('');
 
@@ -116,40 +27,51 @@ const SnippetsPage = () => {
   const debounceRef = React.useRef<number | null>(null);
   const [isPending, startTransition] = React.useTransition();
 
+  const fetchPage = React.useCallback(
+    (page: number, replace: boolean) => async () => {
+      try {
+        const queryParams = new URLSearchParams();
+        if (selectedLanguage) queryParams.append('language', selectedLanguage);
+        queryParams.append('title', titleQuery);
+        queryParams.append('page', String(page));
+        queryParams.append('limit', String(pageSize));
+
+        const res = await axiosInstance.get(`/public/snippets?${queryParams.toString()}`);
+        const data = res.data;
+
+        setCurrentPage(data.current_page);
+        setTotalPages(data.total_pages);
+
+        setPages((old) => (replace ? [data.records] : [...old, data.records]));
+      } catch (error) {
+        console.error('Error fetching snippets', error);
+      }
+    },
+    [selectedLanguage, titleQuery, pageSize]
+  );
+
   React.useEffect(() => {
-    setPages([]);
     setCurrentPage(0);
     setNextPage(1);
     setTotalPages(1);
   }, [titleQuery, selectedLanguage]);
 
   React.useEffect(() => {
-    if (debounceRef.current) {
-      window.clearTimeout(debounceRef.current);
+    // Initial Load
+    if (nextPage === 1) {
+      debounceRef.current = window.setTimeout(() => {
+        startTransition(fetchPage(1, true));
+      }, 500);
+      return () => {
+        if (debounceRef.current) window.clearTimeout(debounceRef.current);
+      };
     }
 
-    debounceRef.current = window.setTimeout(async () => {
-      startTransition(async () => {
-        const res = await axiosInstance.get(
-          `/public/snippets?${
-            selectedLanguage !== '' ? `language=${selectedLanguage}&` : ''
-          }title=${titleQuery}&page=${nextPage}&limit=10`
-        );
-        const data = res.data;
-
-        setCurrentPage(data.current_page);
-        setTotalPages(data.total_pages);
-
-        setPages((old) => (nextPage === 1 ? [data.records] : [...old, data.records]));
-      });
-    }, 250);
-
-    return () => {
-      if (debounceRef.current) {
-        window.clearTimeout(debounceRef.current);
-      }
-    };
-  }, [selectedLanguage, titleQuery, nextPage]);
+    // Infinite scroll
+    if (nextPage > 1) {
+      startTransition(fetchPage(nextPage, false));
+    }
+  }, [nextPage, fetchPage]);
 
   return (
     <div className="h-full flex flex-col">
@@ -161,6 +83,7 @@ const SnippetsPage = () => {
 
       {/* Results Area */}
       <section className="min-h-0 flex-1 relative" aria-label="Snippet Results">
+        {/* Snippets  */}
         <div
           style={gridStyles}
           className="h-full grid gap-1 p-1 overflow-y-auto"
@@ -197,12 +120,15 @@ const SnippetsPage = () => {
           )}
         </div>
 
+        {/* Loading | Condition: Displays when user searches something else, or changes language filter */}
         {isPending && currentPage === 0 && (
           <VscLoading
             size={48}
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 !text-text animate-spin"
           />
         )}
+
+        {/* Not Found | Condition: If no results prompt user to change filters */}
         {totalPages === 0 && (
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 !text-text flex flex-col items-center text-center">
             <VscSearchStop size={48} className="mb-4" />

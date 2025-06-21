@@ -15,8 +15,8 @@ const AppLayout = () => {
         <div className="flex-1 flex p-1 border-b border-border gap-2 flex-col overflow-y-auto">
           <Link
             to="/settings"
-            className={`flex gap-2 items-center cursor-pointer rounded-sm border text-base !text-text p-3 ${
-              path === '/settings' ? 'bg-card border-border' : 'border-transparent hover:bg-card/50'
+            className={`flex gap-2 items-center rounded-sm border text-base !text-text p-3 ${
+              path === '/settings' ? 'bg-card border-border' : 'border-transparent hover:bg-card/50 cursor-pointer'
             }`}
           >
             <VscGear size={16} />
@@ -24,8 +24,8 @@ const AppLayout = () => {
           </Link>
           <Link
             to="/"
-            className={`flex gap-2 items-center cursor-pointer rounded-sm border text-base !text-text p-3 ${
-              path === '/' ? 'bg-card border-border' : 'border-transparent hover:bg-card/50'
+            className={`flex gap-2 items-center rounded-sm border text-base !text-text p-3 ${
+              path === '/' ? 'bg-card border-border' : 'border-transparent hover:bg-card/50 cursor-pointer'
             }`}
           >
             <VscSymbolFile size={16} />
