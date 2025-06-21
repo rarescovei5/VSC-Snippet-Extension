@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { VscError } from 'react-icons/vsc';
-import { putPageSize, putShowLineNumbers } from '../app/settings/settingsSlice';
+import * as settingsActions from '../app/settings/settingsSlice';
 
 /**
  * @param pageSize number
@@ -15,10 +15,9 @@ function parsePageSize(pageSize: string) {
 const SettingsPage = () => {
   const dispatch = useAppDispatch();
 
-  const { pageSize: settings_pageSize } = useAppSelector((state) => state.settingsReducer.apiConfig);
-  const { showLineNumbers: settings_showLineNumbers } = useAppSelector((state) => state.settingsReducer.appearance);
+  const { pageSize: settings_pageSize } = useAppSelector((state) => state.settings.apiConfig);
+  const { showLineNumbers: settings_showLineNumbers } = useAppSelector((state) => state.settings.appearance);
 
-  const [pageSize, setPageSize] = React.useState(`${settings_pageSize}`);
   const [pageSizeError, setPageSizeError] = React.useState('');
 
   return (
@@ -33,10 +32,9 @@ const SettingsPage = () => {
         <p className="text-text-muted text-sm">Controls how many snippets are requested per page</p>
         <input
           id="page-size"
-          value={pageSize}
+          defaultValue={settings_pageSize}
           onChange={(e) => {
             const value = e.target.value;
-            setPageSize(value);
 
             if (parsePageSize(value)) {
               setPageSizeError('');
@@ -44,8 +42,14 @@ const SettingsPage = () => {
               setPageSizeError('Page size must be an integer between 10 and 100.');
             }
           }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              (e.target as HTMLElement).blur();
+            }
+          }}
           onBlur={(e) => {
-            if (parsePageSize(e.target.value)) dispatch(putPageSize({ newPageSize: Number(e.target.value) }));
+            if (parsePageSize(e.target.value))
+              dispatch(settingsActions.setPageSize({ newPageSize: Number(e.target.value) }));
           }}
           min={10}
           max={100}
@@ -67,7 +71,7 @@ const SettingsPage = () => {
           <input
             type="checkbox"
             checked={settings_showLineNumbers}
-            onChange={(e) => dispatch(putShowLineNumbers({ newShowLineNumbers: e.target.checked }))}
+            onChange={(e) => dispatch(settingsActions.setShowLineNumbers({ newShowLineNumbers: e.target.checked }))}
           />
           <p className="text-text-muted text-sm">Controls wheter or not line numbers get displayed in code snippets</p>
         </div>

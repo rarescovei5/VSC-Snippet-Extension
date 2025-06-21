@@ -54,7 +54,7 @@ interface SnippetCardProps {
 }
 
 const SnippetCard = (props: SnippetCardProps) => {
-  const { showLineNumbers } = useAppSelector((state) => state.settingsReducer.appearance);
+  const { showLineNumbers } = useAppSelector((state) => state.settings.appearance);
 
   const LangIcon = iconMap[props.language.toLowerCase()] || LuFileCode;
 

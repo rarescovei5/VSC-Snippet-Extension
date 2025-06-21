@@ -9,6 +9,7 @@
  *
  * @param path - The actual path (e.g. "/users/123")
  * @param pattern - The route pattern (e.g. "/users/:id" or "/foo/*")
+ * @throws When a parameter follows a wildcard (e.g. <code>/*\/:foo</code>)
  * @returns true if they match
  */
 export function matchesPath(path: string, pattern: string): boolean {
@@ -19,6 +20,18 @@ export function matchesPath(path: string, pattern: string): boolean {
   const splitSegments = (input: string) => input.split('/').filter(Boolean);
   const pathSegments = splitSegments(path);
   const patternSegments = splitSegments(pattern);
+
+  for (let i = 0; i < patternSegments.length - 1; i++) {
+    if (patternSegments[i] === '*' && patternSegments[i + 1].startsWith(':')) {
+      console.error(
+        `Illegal route pattern "${pattern}": ` +
+          `parameter segment "${patternSegments[i + 1]}" ` +
+          `cannot immediately follow a wildcard. ` +
+          `Please insert a literal segment between them.`
+      );
+      return false;
+    }
+  }
 
   // Pointers for walking the path and pattern
   let pathIndex = 0;

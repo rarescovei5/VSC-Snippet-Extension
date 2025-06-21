@@ -13,7 +13,7 @@ const gridStyles = {
 };
 
 const SnippetsPage = () => {
-  const pageSize = useAppSelector((state) => state.settingsReducer.apiConfig.pageSize);
+  const pageSize = useAppSelector((state) => state.settings.apiConfig.pageSize);
 
   const [titleQuery, setTitleQuery] = React.useState('');
   const [selectedLanguage, setSelectedLangauge] = React.useState('');

@@ -25,17 +25,17 @@ const settingsSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
-    putPageSize(state, action: PayloadAction<{ newPageSize: number }>) {
+    setPageSize(state, action: PayloadAction<{ newPageSize: number }>) {
       const { newPageSize } = action.payload;
       if (newPageSize < 10) return;
       state.apiConfig.pageSize = newPageSize;
     },
-    putShowLineNumbers(state, action: PayloadAction<{ newShowLineNumbers: boolean }>) {
+    setShowLineNumbers(state, action: PayloadAction<{ newShowLineNumbers: boolean }>) {
       const { newShowLineNumbers } = action.payload;
       state.appearance.showLineNumbers = newShowLineNumbers;
     },
   },
 });
 
-export const { putPageSize, putShowLineNumbers } = settingsSlice.actions;
+export const { setPageSize, setShowLineNumbers } = settingsSlice.actions;
 export default settingsSlice.reducer;
