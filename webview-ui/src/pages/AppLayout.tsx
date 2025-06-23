@@ -28,9 +28,9 @@ const AppLayout = () => {
             <span>Settings</span>
           </Link>
           <Link
-            to="/"
+            to="/snippets"
             className={`flex gap-2 items-center rounded-sm border text-base !text-text p-3 ${
-              path === '/' ? 'bg-card border-border' : 'border-transparent hover:bg-card/50 cursor-pointer'
+              path === '/snippets' ? 'bg-card border-border' : 'border-transparent hover:bg-card/50 cursor-pointer'
             }`}
           >
             <VscSymbolFile size={16} />
@@ -39,9 +39,9 @@ const AppLayout = () => {
           {folders.map((folder, idx) => (
             <Link
               key={idx}
-              to={`/folders/${idx}`}
+              to={`/snippets/folders/${idx}`}
               className={`flex gap-2 items-center rounded-sm border text-base !text-text p-3 ${
-                path === `/folders/${idx}`
+                path === `/snippets/folders/${idx}`
                   ? 'bg-card border-border'
                   : 'border-transparent hover:bg-card/50 cursor-pointer'
               }`}

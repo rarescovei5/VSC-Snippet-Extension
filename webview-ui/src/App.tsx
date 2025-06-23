@@ -1,17 +1,20 @@
 import { ContextRouter, Route, Routes } from './ContextRouter';
 import AppLayout from './pages/AppLayout';
-import FolderPage from './pages/FolderPage';
 import SettingsPage from './pages/SettingsPage';
-import SnippetsPage from './pages/SnippetsPage';
+import SnippetsLayout from './pages/SnippetsLayout';
+import FolderContainer from './pages/FolderContainer';
+import SnippetsContainer from './pages/SnippetsContainer';
 
 function App() {
   return (
     <ContextRouter>
       <Routes>
         <Route path="/*" element={<AppLayout />}>
-          <Route path="" element={<SnippetsPage />} />
+          <Route path="/snippets/*" element={<SnippetsLayout />}>
+            <Route path="" element={<SnippetsContainer />} />
+            <Route path="/folders/:folderId" element={<FolderContainer />} />
+          </Route>
           <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/folders/:folderId" element={<FolderPage />} />
         </Route>
       </Routes>
     </ContextRouter>
