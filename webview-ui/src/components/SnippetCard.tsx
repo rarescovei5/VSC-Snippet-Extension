@@ -84,6 +84,18 @@ export const SnippetCard = (props: SnippetCardProps) => {
 
   return (
     <div
+      onClick={(e) => {
+        if (!e.shiftKey) return;
+        selectionCtx.setSelectedSnippetIds((prev) => {
+          const newSet = new Set(prev);
+          if (!newSet.has(props.snippetId)) {
+            newSet.add(props.snippetId);
+          } else {
+            newSet.delete(props.snippetId);
+          }
+          return newSet;
+        });
+      }}
       draggable={isSelected}
       onDragStart={isSelected ? handleDragStart : () => {}}
       onDragEnd={isSelected ? handleDragEnd : () => {}}
@@ -148,7 +160,8 @@ export const SnippetCard = (props: SnippetCardProps) => {
       {/* Footer  */}
       <div className="flex justify-between !text-text">
         <button
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             navigator.clipboard.writeText(props.code);
           }}
           className="px-3 py-1 border border-border rounded-sm cursor-pointer"
