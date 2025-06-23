@@ -2,13 +2,40 @@ import { VscCode, VscFolder, VscGear, VscSymbolFile } from 'react-icons/vsc';
 import { Link, Outlet } from '../ContextRouter';
 import { useRouter } from '../ContextRouter/utilities/useRouter';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { addFolder } from '../app/folders/foldersSlice';
+import { addFolder, addRemoteSnippets } from '../app/folders/foldersSlice';
+import type { Uuid } from '../types/types';
+import React from 'react';
 
 const AppLayout = () => {
   const dispatch = useAppDispatch();
   const folders = useAppSelector((state) => state.folders);
 
+  const [dragOverFolder, setDragOverFolder] = React.useState<number | null>(null);
+
   const { path } = useRouter();
+
+  const handleFolderDrop = (e: React.DragEvent<HTMLAnchorElement>, folderIdx: number) => {
+    e.preventDefault(); // 1) allow the drop
+    const json = e.dataTransfer.getData('application/json');
+    if (!json) return;
+
+    try {
+      const snippetIds: Uuid[] = JSON.parse(json);
+      // dispatch your action to move these snippets into folderIdx
+      dispatch(addRemoteSnippets({ folderIdx, snippetIds }));
+    } catch {
+      console.error('Failed to parse dropped snippet IDs');
+    }
+
+    setDragOverFolder(null);
+  };
+  const handleDragOver = (e: React.DragEvent<HTMLElement>, idx: number) => {
+    e.preventDefault();
+    setDragOverFolder(idx);
+  };
+  const handleDragLeave = () => {
+    setDragOverFolder(null);
+  };
 
   return (
     <div className="h-svh flex justify-between bg-background overflow-hidden">
@@ -39,12 +66,16 @@ const AppLayout = () => {
           {folders.map((folder, idx) => (
             <Link
               key={idx}
+              onDrop={(e) => handleFolderDrop(e, idx)}
+              onDragOver={(e) => handleDragOver(e, idx)}
+              onDragLeave={handleDragLeave}
               to={`/snippets/folders/${idx}`}
               className={`flex gap-2 items-center rounded-sm border text-base !text-text p-3 ${
                 path === `/snippets/folders/${idx}`
                   ? 'bg-card border-border'
                   : 'border-transparent hover:bg-card/50 cursor-pointer'
-              }`}
+              }
+              ${dragOverFolder === idx && 'ring-2 ring-text'}`}
             >
               <VscFolder />
               {folder.name}

@@ -22,6 +22,8 @@ import { VscStarFull } from 'react-icons/vsc';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { useAppSelector } from '../app/hooks';
+import type { Uuid } from '../types/types';
+import { SelectionContext } from '../pages/SnippetsContainer';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   c: SiC,
@@ -44,63 +46,6 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   xml: SiXml,
 };
 
-type SnippetCardCoreProps = {
-  title: string;
-  description: string;
-  language: string;
-  code: string;
-} & React.HTMLAttributes<HTMLDivElement>;
-
-export const SnippetCardCore = (props: SnippetCardCoreProps) => {
-  const { title, description, language, code, ...divProps } = props;
-  const { showLineNumbers } = useAppSelector((state) => state.settings.appearance);
-
-  const LangIcon = iconMap[language.toLowerCase()] || LuFileCode;
-
-  return (
-    <div className="bg-card p-3 flex flex-col justify-between gap-4 rounded-sm border border-border" {...divProps}>
-      {/* Header  */}
-      <div className="flex flex-col !text-text gap-2">
-        <div className="flex items-center gap-2">
-          <LangIcon />
-          <h3 className="text-base">{title}</h3>
-        </div>
-        <p className="!text-text">{description}</p>
-      </div>
-
-      {/* Content */}
-      <SyntaxHighlighter
-        language={language}
-        customStyle={{
-          fontSize: '0.9rem',
-          fontFamily: 'Fira Code, Consolas, Menlo, monospace',
-          margin: 0,
-          padding: '0.75rem',
-          background: 'var(--vscode-panel-border)',
-          borderRadius: '0.25rem',
-          maxHeight: '250px',
-        }}
-        showLineNumbers={showLineNumbers}
-        style={atomOneDark}
-      >
-        {code}
-      </SyntaxHighlighter>
-
-      {/* Footer  */}
-      <div className="flex justify-between !text-text">
-        <button
-          onClick={() => {
-            navigator.clipboard.writeText(code);
-          }}
-          className="px-3 py-1 border border-border rounded-sm cursor-pointer"
-        >
-          Copy
-        </button>
-      </div>
-    </div>
-  );
-};
-
 interface SnippetCardProps {
   title: string;
   description: string;
@@ -108,20 +53,69 @@ interface SnippetCardProps {
   code: string;
   stars: number;
   tags: Array<string>;
+  snippetId: Uuid;
 }
 
 export const SnippetCard = (props: SnippetCardProps) => {
+  // Appearance
   const { showLineNumbers } = useAppSelector((state) => state.settings.appearance);
-
   const LangIcon = iconMap[props.language.toLowerCase()] || LuFileCode;
 
+  // Selection
+  const selectionCtx = React.useContext(SelectionContext);
+
+  const isSelected = selectionCtx.selectedSnippetIds.has(props.snippetId);
+
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+    const allIds = Array.from(selectionCtx.selectedSnippetIds);
+    const total = allIds.length;
+
+    const host = document.getElementById('drag-preview-container')!;
+    host.querySelector('span')!.innerText = `${total}`;
+
+    e.dataTransfer.setDragImage(host, 5, 5);
+
+    e.dataTransfer.setData('application/json', JSON.stringify(allIds));
+  };
+  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    selectionCtx.setSelectedSnippetIds(new Set());
+  };
+
   return (
-    <div className="bg-card p-3 flex flex-col justify-between gap-4 rounded-sm border border-border">
+    <div
+      draggable={isSelected}
+      onDragStart={isSelected ? handleDragStart : () => {}}
+      onDragEnd={isSelected ? handleDragEnd : () => {}}
+      className={`group bg-card p-3 flex flex-col justify-between gap-4 rounded-sm border border-border ring ${
+        isSelected ? 'ring-text' : 'ring-transparent'
+      }`}
+    >
       {/* Header  */}
       <div className="flex flex-col !text-text gap-2">
-        <div className="flex items-center gap-2">
-          <LangIcon />
-          <h3 className="text-base">{props.title}</h3>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <LangIcon />
+            <h3 className="text-base">{props.title}</h3>
+          </div>
+          <div
+            className={`rounded-sm items-center justify-center border cursor-pointer border-text/50 w-4 h-4 ${
+              isSelected ? 'flex' : 'hidden group-hover:flex'
+            }`}
+            onClick={() => {
+              selectionCtx.setSelectedSnippetIds((prev) => {
+                const newSet = new Set(prev);
+                if (!newSet.has(props.snippetId)) {
+                  newSet.add(props.snippetId);
+                } else {
+                  newSet.delete(props.snippetId);
+                }
+                return newSet;
+              });
+            }}
+          >
+            {isSelected && <div className="bg-text/50 w-3 h-3 rounded-xs" />}
+          </div>
         </div>
         <div className="flex gap-2 overflow-x-auto">
           {props.tags.map((tag, index) => (
@@ -165,6 +159,116 @@ export const SnippetCard = (props: SnippetCardProps) => {
           <span>{props.stars}</span>
           <VscStarFull />
         </div>
+      </div>
+    </div>
+  );
+};
+
+interface RemoteSnippetCardProps {
+  title: string;
+  description: string;
+  language: string;
+  code: string;
+}
+export const RemoteSnippetCard = (props: RemoteSnippetCardProps) => {
+  const { showLineNumbers } = useAppSelector((state) => state.settings.appearance);
+
+  const LangIcon = iconMap[props.language.toLowerCase()] || LuFileCode;
+
+  return (
+    <div className="bg-card p-3 flex flex-col justify-between gap-4 rounded-sm border border-border">
+      {/* Header  */}
+      <div className="flex flex-col !text-text gap-2">
+        <div className="flex items-center gap-2">
+          <LangIcon />
+          <h3 className="text-base">{props.title}</h3>
+        </div>
+        <p className="!text-text">{props.description}</p>
+      </div>
+
+      {/* Content */}
+      <SyntaxHighlighter
+        language={props.language}
+        customStyle={{
+          fontSize: '0.9rem',
+          fontFamily: 'Fira Code, Consolas, Menlo, monospace',
+          margin: 0,
+          padding: '0.75rem',
+          background: 'var(--vscode-panel-border)',
+          borderRadius: '0.25rem',
+          maxHeight: '250px',
+        }}
+        showLineNumbers={showLineNumbers}
+        style={atomOneDark}
+      >
+        {props.code}
+      </SyntaxHighlighter>
+
+      {/* Footer  */}
+      <div className="flex !text-text">
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(props.code);
+          }}
+          className="px-3 py-1 border border-border rounded-sm cursor-pointer"
+        >
+          Copy
+        </button>
+      </div>
+    </div>
+  );
+};
+
+interface LocalSnippetCardProps {
+  title: string;
+  description: string;
+  language: string;
+  code: string;
+}
+export const LocalSnippetCard = (props: LocalSnippetCardProps) => {
+  const { showLineNumbers } = useAppSelector((state) => state.settings.appearance);
+
+  const LangIcon = iconMap[props.language.toLowerCase()] || LuFileCode;
+
+  return (
+    <div className="bg-card p-3 flex flex-col justify-between gap-4 rounded-sm border border-border">
+      {/* Header  */}
+      <div className="flex flex-col !text-text gap-2">
+        <div className="flex items-center gap-2">
+          <LangIcon />
+          <h3 className="text-base">{props.title}</h3>
+        </div>
+        <p className="!text-text">{props.description}</p>
+      </div>
+
+      {/* Content */}
+      <SyntaxHighlighter
+        language={props.language}
+        customStyle={{
+          fontSize: '0.9rem',
+          fontFamily: 'Fira Code, Consolas, Menlo, monospace',
+          margin: 0,
+          padding: '0.75rem',
+          background: 'var(--vscode-panel-border)',
+          borderRadius: '0.25rem',
+          maxHeight: '250px',
+        }}
+        showLineNumbers={showLineNumbers}
+        style={atomOneDark}
+      >
+        {props.code}
+      </SyntaxHighlighter>
+
+      {/* Footer  */}
+      <div className="flex !text-text">
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(props.code);
+          }}
+          className="px-3 py-1 border border-border rounded-sm cursor-pointer"
+        >
+          Copy
+        </button>
       </div>
     </div>
   );

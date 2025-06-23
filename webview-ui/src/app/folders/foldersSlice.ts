@@ -20,9 +20,25 @@ const foldersSlice = createSlice({
       const { name } = action.payload;
       state.push({ name, items: [] });
     },
-    // addRemoteSnippet(state,action:PayloadAction<{folderIdx:number, }>)
+    addRemoteSnippets(state, action: PayloadAction<{ folderIdx: number; snippetIds: Uuid[] }>) {
+      const { folderIdx, snippetIds } = action.payload;
+      const folder = state[folderIdx];
+
+      snippetIds.forEach((snippetId) => {
+        const exists = folder.items.some((item) => item.kind === 'remote' && item.snippetId === snippetId);
+        if (!exists) {
+          folder.items.push({ kind: 'remote', snippetId });
+        }
+      });
+    },
+
+    removeSnippet(state, action: PayloadAction<{ folderIdx: number; idx: number }>) {
+      const { folderIdx, idx } = action.payload;
+      const folder = state[folderIdx];
+      folder.items.splice(idx, 1);
+    },
   },
 });
 
-export const { addFolder } = foldersSlice.actions;
+export const { addFolder, addRemoteSnippets, removeSnippet } = foldersSlice.actions;
 export default foldersSlice.reducer;

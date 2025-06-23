@@ -1,10 +1,20 @@
 import React from 'react';
-import type { Snippet } from '../types/types';
+import type { Snippet, Uuid } from '../types/types';
 import { axiosInstance } from '../api';
 import { useAppSelector } from '../app/hooks';
 import { gridStyles, QueryContext } from './SnippetsLayout';
 import { SnippetCard } from '../components/SnippetCard';
 import { VscLoading, VscSearchStop } from 'react-icons/vsc';
+
+interface SelectedContextType {
+  selectedSnippetIds: Set<Uuid>;
+  setSelectedSnippetIds: React.Dispatch<React.SetStateAction<Set<Uuid>>>;
+}
+const initialSelectionContext: SelectedContextType = {
+  selectedSnippetIds: new Set(),
+  setSelectedSnippetIds: () => {},
+};
+export const SelectionContext = React.createContext<SelectedContextType>(initialSelectionContext);
 
 const SnippetsContainer = () => {
   const { selectedLanguage, titleQuery } = React.useContext(QueryContext);
@@ -66,8 +76,11 @@ const SnippetsContainer = () => {
     }
   }, [nextPage, fetchPage]);
 
+  const [selectedSnippetIds, setSelectedSnippetIds] = React.useState<Set<Uuid>>(() => new Set());
+  const value = React.useMemo(() => ({ selectedSnippetIds, setSelectedSnippetIds }), [selectedSnippetIds]);
+
   return (
-    <>
+    <SelectionContext value={value}>
       {/* Snippets  */}
       <div
         style={gridStyles}
@@ -93,6 +106,7 @@ const SnippetsContainer = () => {
                   description={snippet.description ?? ''}
                   code={snippet.code ?? ''}
                   stars={snippet.stars}
+                  snippetId={snippet.id}
                 />
               ))}
             </React.Fragment>
@@ -119,7 +133,7 @@ const SnippetsContainer = () => {
           <p className="text-text-muted mt-1 text-sm">Try adjusting your filters</p>
         </div>
       )}
-    </>
+    </SelectionContext>
   );
 };
 
