@@ -20,6 +20,7 @@ const foldersSlice = createSlice({
       const { name } = action.payload;
       state.push({ name, items: [] });
     },
+    // addRemoteSnippet(state,action:PayloadAction<{folderIdx:number, }>)
   },
 });
 

@@ -7,7 +7,7 @@ import SnippetsContainer from './pages/SnippetsContainer';
 
 function App() {
   return (
-    <ContextRouter>
+    <ContextRouter basePath="/snippets">
       <Routes>
         <Route path="/*" element={<AppLayout />}>
           <Route path="/snippets/*" element={<SnippetsLayout />}>
