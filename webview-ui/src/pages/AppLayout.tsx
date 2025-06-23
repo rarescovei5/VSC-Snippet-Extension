@@ -38,6 +38,7 @@ const AppLayout = () => {
           </Link>
           {folders.map((folder, idx) => (
             <Link
+              key={idx}
               to={`/folders/${idx}`}
               className={`flex gap-2 items-center rounded-sm border text-base !text-text p-3 ${
                 path === `/folders/${idx}`

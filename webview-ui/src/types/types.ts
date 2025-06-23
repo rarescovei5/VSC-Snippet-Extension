@@ -9,3 +9,5 @@ export interface Snippet {
   stars: number;
   tags: Array<string>;
 }
+
+export type Prettify<T> = { [K in keyof T]: T[K] } & {};

@@ -2,12 +2,12 @@ import React from 'react';
 import { VscLoading, VscSearchStop } from 'react-icons/vsc';
 import { axiosInstance } from '../api';
 import type { Snippet } from '../types/types';
-import SnippetCard from '../components/SnippetCard';
+import { SnippetCard } from '../components/SnippetCard';
 import { useAppSelector } from '../app/hooks';
 import LanguageSelect from '../components/LanguageSelect';
 import TitleSearchbar from '../components/TitleSearchbar';
 
-const gridStyles = {
+export const gridStyles = {
   gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
   gridAutoRows: 'max-content',
 };

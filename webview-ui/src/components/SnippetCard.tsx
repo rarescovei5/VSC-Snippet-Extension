@@ -44,6 +44,63 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   xml: SiXml,
 };
 
+type SnippetCardCoreProps = {
+  title: string;
+  description: string;
+  language: string;
+  code: string;
+} & React.HTMLAttributes<HTMLDivElement>;
+
+export const SnippetCardCore = (props: SnippetCardCoreProps) => {
+  const { title, description, language, code, ...divProps } = props;
+  const { showLineNumbers } = useAppSelector((state) => state.settings.appearance);
+
+  const LangIcon = iconMap[language.toLowerCase()] || LuFileCode;
+
+  return (
+    <div className="bg-card p-3 flex flex-col justify-between gap-4 rounded-sm border border-border" {...divProps}>
+      {/* Header  */}
+      <div className="flex flex-col !text-text gap-2">
+        <div className="flex items-center gap-2">
+          <LangIcon />
+          <h3 className="text-base">{title}</h3>
+        </div>
+        <p className="!text-text">{description}</p>
+      </div>
+
+      {/* Content */}
+      <SyntaxHighlighter
+        language={language}
+        customStyle={{
+          fontSize: '0.9rem',
+          fontFamily: 'Fira Code, Consolas, Menlo, monospace',
+          margin: 0,
+          padding: '0.75rem',
+          background: 'var(--vscode-panel-border)',
+          borderRadius: '0.25rem',
+          maxHeight: '250px',
+        }}
+        showLineNumbers={showLineNumbers}
+        style={atomOneDark}
+      >
+        {code}
+      </SyntaxHighlighter>
+
+      {/* Footer  */}
+      <div className="flex justify-between !text-text">
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(code);
+          }}
+          className="px-3 py-1 border border-border rounded-sm cursor-pointer"
+        >
+          Copy
+        </button>
+      </div>
+    </div>
+  );
+};
+
 interface SnippetCardProps {
   title: string;
   description: string;
@@ -53,7 +110,7 @@ interface SnippetCardProps {
   tags: Array<string>;
 }
 
-const SnippetCard = (props: SnippetCardProps) => {
+export const SnippetCard = (props: SnippetCardProps) => {
   const { showLineNumbers } = useAppSelector((state) => state.settings.appearance);
 
   const LangIcon = iconMap[props.language.toLowerCase()] || LuFileCode;
@@ -112,5 +169,3 @@ const SnippetCard = (props: SnippetCardProps) => {
     </div>
   );
 };
-
-export default React.memo(SnippetCard);

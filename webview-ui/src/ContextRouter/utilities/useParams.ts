@@ -4,6 +4,16 @@ import { RouteContext } from '../components/Route';
 
 const splitSegments = (input: string) => input.split('/').filter((seg) => seg.length > 0);
 
+// export type ParamKeys<S extends string> = S extends `${infer _Start}:${infer Param}/${infer Rest}`
+//   ? Param | ParamKeys<`/${Rest}`>
+//   : S extends `${infer _Start}:${infer Param}`
+//   ? Param
+//   : never;
+//
+// export function useParamsTyped<P extends string>(_: P): Record<ParamKeys<P>, string> {
+//   return useParams();
+// }
+
 /**
  * @throws When a parameter follows a wildcard (e.g. <code>/*\/:foo</code>)
  * @returns An object whose keys are the path-parameter names and values are the matched segments.

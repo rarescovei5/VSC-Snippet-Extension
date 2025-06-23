@@ -11,7 +11,7 @@ function App() {
         <Route path="/*" element={<AppLayout />}>
           <Route path="" element={<SnippetsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/folder/:folderId" element={<FolderPage />} />
+          <Route path="/folders/:folderId" element={<FolderPage />} />
         </Route>
       </Routes>
     </ContextRouter>
