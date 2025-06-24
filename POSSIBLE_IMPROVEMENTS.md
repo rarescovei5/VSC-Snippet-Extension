@@ -7,7 +7,8 @@
 #### Optional
 
     - Instead of forcing user to drag and drop, add a menu that pops up on "CTRL+SHIFT+P" with which you can add snippets to selected folders;
-    - When copying a snippet, as well as writing to clipboard, register a command where if you type "snip" in your editor and press enter it automatically inserts the copied snippet. Further improvements on this could be supporting user-defined shortcuts for their saved snippets.
+    - When copying a snippet, as well as writing to clipboard, register a command where if you type "snip" in your editor and press enter it automatically inserts the copied snippet. Further improvements on this could be supporting user-defined shortcuts for their saved snippets;
+    - Make it so you can add snippets from folders to other folders (through drag and drop).
 
 ## Code related
 

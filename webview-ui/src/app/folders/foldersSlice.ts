@@ -1,11 +1,11 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { LocalSnippet, Prettify, Uuid } from '../../types/types';
 
+export type FolderSnippets = Array<{ kind: 'remote'; snippetId: Uuid } | Prettify<LocalSnippet>>;
 interface Folder {
   name: string;
-  items: Array<{ kind: 'remote'; snippetId: Uuid } | Prettify<LocalSnippet>>;
+  items: FolderSnippets;
 }
-
 type FolderState = Folder[];
 
 const initialState: FolderState = JSON.parse(localStorage.getItem('code-snippets/folders') || '[]');
@@ -20,32 +20,44 @@ const foldersSlice = createSlice({
     },
     deleteFolder(state, action: PayloadAction<{ folderIdx: number }>) {
       const { folderIdx } = action.payload;
+      if (folderIdx > state.length - 1) return;
+
       state.splice(folderIdx, 1);
     },
     setFolderName(state, action: PayloadAction<{ folderIdx: number; newFolderName: string }>) {
       const { folderIdx, newFolderName } = action.payload;
       const folder = state[folderIdx];
+      if (!folder) return;
 
       folder.name = newFolderName;
     },
-    addRemoteSnippets(state, action: PayloadAction<{ folderIdx: number; snippetIds: Uuid[] }>) {
-      const { folderIdx, snippetIds } = action.payload;
+    addSnippets(state, action: PayloadAction<{ folderIdx: number; snippets: FolderSnippets }>) {
+      const { folderIdx, snippets } = action.payload;
       const folder = state[folderIdx];
+      if (!folder) return;
 
-      snippetIds.forEach((snippetId) => {
-        const exists = folder.items.some((item) => item.kind === 'remote' && item.snippetId === snippetId);
+      snippets.forEach((snippet) => {
+        const exists = folder.items.some(
+          (item) =>
+            snippet.kind !== item.kind ||
+            (snippet.kind === 'remote' && item.kind === 'remote' && item.snippetId === snippet.snippetId) ||
+            (snippet.kind === 'local' && item.kind === 'local' && item.code === snippet.code)
+        );
         if (!exists) {
-          folder.items.push({ kind: 'remote', snippetId });
+          folder.items.push(snippet);
         }
       });
     },
-    removeSnippet(state, action: PayloadAction<{ folderIdx: number; idx: number }>) {
-      const { folderIdx, idx } = action.payload;
+    deleteSnippets(state, action: PayloadAction<{ folderIdx: number; snippetIdxs: number[] }>) {
+      const { folderIdx, snippetIdxs } = action.payload;
       const folder = state[folderIdx];
-      folder.items.splice(idx, 1);
+      if (!folder) return;
+
+      const toRemove = new Set(snippetIdxs);
+      folder.items = folder.items.filter((_, idx) => !toRemove.has(idx));
     },
   },
 });
 
-export const { addFolder, deleteFolder, addRemoteSnippets, removeSnippet, setFolderName } = foldersSlice.actions;
+export const { addFolder, deleteFolder, addSnippets, deleteSnippets, setFolderName } = foldersSlice.actions;
 export default foldersSlice.reducer;

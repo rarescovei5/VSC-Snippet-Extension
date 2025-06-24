@@ -2,8 +2,8 @@ import { VscClose, VscCode, VscFolder, VscGear, VscSymbolFile } from 'react-icon
 import { Link, Outlet } from '../ContextRouter';
 import { useRouter } from '../ContextRouter/utilities/useRouter';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { addFolder, addRemoteSnippets, deleteFolder, setFolderName } from '../app/folders/foldersSlice';
-import type { Uuid } from '../types/types';
+import { addFolder, addSnippets, deleteFolder, setFolderName, type FolderSnippets } from '../app/folders/foldersSlice';
+import type { LocalSnippet, Prettify, Uuid } from '../types/types';
 import React from 'react';
 import { useModal } from '../components/ModalProvider';
 
@@ -18,14 +18,14 @@ const AppLayout = () => {
   const { path, navigate } = useRouter();
 
   const handleFolderDrop = (e: React.DragEvent<HTMLAnchorElement>, folderIdx: number) => {
-    e.preventDefault(); // 1) allow the drop
-    const json = e.dataTransfer.getData('application/json');
+    e.preventDefault();
+    const json = e.dataTransfer.getData('application/x-folder-snippets');
     if (!json) return;
 
     try {
-      const snippetIds: Uuid[] = JSON.parse(json);
+      const folderSnippets: FolderSnippets = JSON.parse(json);
       // dispatch your action to move these snippets into folderIdx
-      dispatch(addRemoteSnippets({ folderIdx, snippetIds }));
+      dispatch(addSnippets({ folderIdx, snippets: folderSnippets }));
     } catch {
       console.error('Failed to parse dropped snippet IDs');
     }
