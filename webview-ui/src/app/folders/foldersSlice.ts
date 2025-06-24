@@ -20,6 +20,16 @@ const foldersSlice = createSlice({
       const { name } = action.payload;
       state.push({ name, items: [] });
     },
+    deleteFolder(state, action: PayloadAction<{ folderIdx: number }>) {
+      const { folderIdx } = action.payload;
+      state.splice(folderIdx, 1);
+    },
+    setFolderName(state, action: PayloadAction<{ folderIdx: number; newFolderName: string }>) {
+      const { folderIdx, newFolderName } = action.payload;
+      const folder = state[folderIdx];
+
+      folder.name = newFolderName;
+    },
     addRemoteSnippets(state, action: PayloadAction<{ folderIdx: number; snippetIds: Uuid[] }>) {
       const { folderIdx, snippetIds } = action.payload;
       const folder = state[folderIdx];
@@ -31,7 +41,6 @@ const foldersSlice = createSlice({
         }
       });
     },
-
     removeSnippet(state, action: PayloadAction<{ folderIdx: number; idx: number }>) {
       const { folderIdx, idx } = action.payload;
       const folder = state[folderIdx];
@@ -40,5 +49,5 @@ const foldersSlice = createSlice({
   },
 });
 
-export const { addFolder, addRemoteSnippets, removeSnippet } = foldersSlice.actions;
+export const { addFolder, deleteFolder, addRemoteSnippets, removeSnippet, setFolderName } = foldersSlice.actions;
 export default foldersSlice.reducer;

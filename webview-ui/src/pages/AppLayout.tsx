@@ -1,18 +1,21 @@
-import { VscCode, VscFolder, VscGear, VscSymbolFile } from 'react-icons/vsc';
+import { VscClose, VscCode, VscFolder, VscGear, VscSymbolFile } from 'react-icons/vsc';
 import { Link, Outlet } from '../ContextRouter';
 import { useRouter } from '../ContextRouter/utilities/useRouter';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { addFolder, addRemoteSnippets } from '../app/folders/foldersSlice';
+import { addFolder, addRemoteSnippets, deleteFolder, setFolderName } from '../app/folders/foldersSlice';
 import type { Uuid } from '../types/types';
 import React from 'react';
+import { useModal } from '../components/ModalProvider';
 
 const AppLayout = () => {
+  const modalCtx = useModal();
+
   const dispatch = useAppDispatch();
   const folders = useAppSelector((state) => state.folders);
 
   const [dragOverFolder, setDragOverFolder] = React.useState<number | null>(null);
 
-  const { path } = useRouter();
+  const { path, navigate } = useRouter();
 
   const handleFolderDrop = (e: React.DragEvent<HTMLAnchorElement>, folderIdx: number) => {
     e.preventDefault(); // 1) allow the drop
@@ -36,6 +39,14 @@ const AppLayout = () => {
   const handleDragLeave = () => {
     setDragOverFolder(null);
   };
+  const commitFolderName = (target: HTMLSpanElement, idx: number) => {
+    if (target.innerText.trim()) {
+      dispatch(setFolderName({ folderIdx: idx, newFolderName: target.innerText }));
+    }
+    setActiveFolderEditIdx(-1);
+  };
+
+  const [activeFolderEditIdx, setActiveFolderEditIdx] = React.useState(-1);
 
   return (
     <div className="h-svh flex justify-between bg-background overflow-hidden">
@@ -63,24 +74,78 @@ const AppLayout = () => {
             <VscSymbolFile size={16} />
             <span>Snippets</span>
           </Link>
-          {folders.map((folder, idx) => (
-            <Link
-              key={idx}
-              onDrop={(e) => handleFolderDrop(e, idx)}
-              onDragOver={(e) => handleDragOver(e, idx)}
-              onDragLeave={handleDragLeave}
-              to={`/snippets/folders/${idx}`}
-              className={`flex gap-2 items-center rounded-sm border text-base !text-text p-3 ${
-                path === `/snippets/folders/${idx}`
-                  ? 'bg-card border-border'
-                  : 'border-transparent hover:bg-card/50 cursor-pointer'
-              }
-              ${dragOverFolder === idx && 'ring-2 ring-text'}`}
-            >
-              <VscFolder />
-              {folder.name}
-            </Link>
-          ))}
+          {folders.map((folder, idx) => {
+            const matchesPath = path === `/snippets/folders/${idx}`;
+
+            return (
+              <Link
+                key={idx}
+                to={`/snippets/folders/${idx}`}
+                className={`group flex relative pr-8 gap-2 items-center rounded-sm border text-base !text-text p-3 ${
+                  matchesPath ? 'bg-card border-border' : 'border-transparent hover:bg-card/50 cursor-pointer'
+                }
+              ${dragOverFolder === idx && 'ring-2 ring-text'}
+              ${activeFolderEditIdx === idx && 'border-dashed border-text'}`}
+                // Drop Snippets Logic
+                onDragOver={(e) => handleDragOver(e, idx)}
+                onDrop={(e) => handleFolderDrop(e, idx)}
+                onDragLeave={handleDragLeave}
+              >
+                <VscFolder />
+                <span
+                  className="outline-none"
+                  //Edit Name Logic
+                  onDoubleClick={(e) => {
+                    setActiveFolderEditIdx(idx);
+                    requestAnimationFrame(() => (e.target as HTMLSpanElement).focus());
+                  }}
+                  contentEditable={activeFolderEditIdx === idx}
+                  suppressContentEditableWarning
+                  onBlur={(e) => commitFolderName(e.target as HTMLSpanElement, idx)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      commitFolderName(e.target as HTMLSpanElement, idx);
+                    }
+                  }}
+                >
+                  {activeFolderEditIdx === idx ? '' : folder.name}
+                </span>
+                {matchesPath && (
+                  <VscClose
+                    className="absolute right-2 top-1/2 -translate-y-1/2 group-hover:block hidden cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (folder.items.length) {
+                        modalCtx.open(
+                          <>
+                            <h2 className="text-lg font-semibold">Delete "{folder.name}"?</h2>
+                            <p className="text-sm text-text-muted leading-relaxed max-w-sm">
+                              This action is <span className="font-medium text-red-500">irreversible</span>. All
+                              contents within this folder will be permanently removed. Please proceed with caution.
+                            </p>
+                            <button
+                              className="border-red-500 border bg-red-500 px-3 py-1 rounded-sm mr-4 cursor-pointer"
+                              onClick={() => {
+                                modalCtx.close();
+                                dispatch(deleteFolder({ folderIdx: idx }));
+                                navigate('/snippets');
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </>
+                        );
+                      } else {
+                        dispatch(deleteFolder({ folderIdx: idx }));
+                        navigate('/snippets');
+                      }
+                    }}
+                  />
+                )}
+              </Link>
+            );
+          })}
         </div>
         <div className="p-1 !text-text">
           <button
