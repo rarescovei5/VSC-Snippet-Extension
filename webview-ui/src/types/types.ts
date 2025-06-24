@@ -10,4 +10,7 @@ export interface Snippet {
   tags: Array<string>;
 }
 
+export type RemoteSnippet = { kind: 'remote' } & Omit<Snippet, 'tags' | 'stars'>;
+export type LocalSnippet = { kind: 'local' } & Omit<Snippet, 'id' | 'tags' | 'stars'>;
+
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};

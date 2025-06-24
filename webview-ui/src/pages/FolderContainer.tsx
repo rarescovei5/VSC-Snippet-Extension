@@ -1,5 +1,5 @@
 import React from 'react';
-import { LocalSnippetCard } from '../components/SnippetCard';
+import { LocalSnippetCard, RemoteSnippetCard } from '../components/SnippetCard';
 import { gridStyles, QueryContext } from './SnippetsLayout';
 import { VscFiles, VscSearchStop } from 'react-icons/vsc';
 import SelectionProvider from '../components/SelectionProvider';
@@ -14,15 +14,25 @@ const FolderContainer = () => {
     <SelectionProvider>
       {/* Snippets  */}
       <div style={gridStyles} className="h-full grid gap-1 p-1 overflow-y-auto">
-        {snippets.map((snippet, idx) => (
-          <LocalSnippetCard
-            key={idx}
-            code={snippet.code ?? ''}
-            description={snippet.description ?? ''}
-            language={snippet.language}
-            title={snippet.title}
-          />
-        ))}
+        {snippets.map((snip) =>
+          snip.kind === 'local' ? (
+            <LocalSnippetCard
+              key={snip.idx}
+              code={snip.code ?? ''}
+              description={snip.description}
+              language={snip.language}
+              title={snip.title}
+            />
+          ) : (
+            <RemoteSnippetCard
+              key={snip.idx}
+              code={snip.code ?? ''}
+              description={snip.description}
+              language={snip.language}
+              title={snip.title}
+            />
+          )
+        )}
 
         {isEmpty ? (
           <EmptyState

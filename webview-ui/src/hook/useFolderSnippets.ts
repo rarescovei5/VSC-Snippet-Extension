@@ -2,7 +2,7 @@ import React from 'react';
 import { axiosInstance } from '../api';
 import { useAppSelector } from '../app/hooks';
 import { useParams } from '../ContextRouter/utilities/useParams';
-import type { Prettify, Snippet } from '../types/types';
+import type { Prettify, RemoteSnippet } from '../types/types';
 
 export function useFolderSnippets(titleQuery: string, selectedLanguage: string) {
   const folderId = Number(useParams().folderId);
@@ -14,16 +14,16 @@ export function useFolderSnippets(titleQuery: string, selectedLanguage: string) 
   const local = React.useMemo(() => itemsWithIdx.filter((i) => i.kind === 'local'), [itemsWithIdx]);
 
   // fetch remote details
-  const [remote, setRemote] = React.useState<Prettify<Snippet & { idx: number }>[]>([]);
+  const [remote, setRemote] = React.useState<Prettify<RemoteSnippet & { idx: number }>[]>([]);
   const fetchRemote = React.useCallback(async () => {
     const ids = remoteRefs.map((r) => r.snippetId).join(',');
-    const res = await axiosInstance.get<Snippet[]>(`/public/snippets/batch?ids=${ids}`);
+    const res = await axiosInstance.get<Omit<RemoteSnippet, 'kind'>[]>(`/public/snippets/batch?ids=${ids}`);
     const merged = res.data
       .map((s) => {
         const ref = remoteRefs.find((r) => r.snippetId === s.id);
-        return ref ? { ...s, idx: ref.idx } : null;
+        return ref ? { ...s, kind: 'remote' as const, idx: ref.idx } : null;
       })
-      .filter(Boolean) as Prettify<Snippet & { idx: number }>[];
+      .filter((s) => s !== null);
     setRemote(merged);
   }, [remoteRefs]);
 
@@ -36,9 +36,7 @@ export function useFolderSnippets(titleQuery: string, selectedLanguage: string) 
     ({ title, language }: { title: string; language: string }) => {
       const okTitle = !titleQuery || title.toLowerCase().includes(titleQuery.toLowerCase());
       const okLang =
-        !selectedLanguage || selectedLanguage === 'all'
-          ? true
-          : language.toLowerCase() === selectedLanguage.toLowerCase();
+        !selectedLanguage || selectedLanguage === '' ? true : language.toLowerCase() === selectedLanguage.toLowerCase();
       return okTitle && okLang;
     },
     [titleQuery, selectedLanguage]

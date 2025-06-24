@@ -179,7 +179,7 @@ export const SnippetCard = (props: SnippetCardProps) => {
 
 interface RemoteSnippetCardProps {
   title: string;
-  description: string;
+  description: string | null;
   language: string;
   code: string;
 }
@@ -234,7 +234,7 @@ export const RemoteSnippetCard = (props: RemoteSnippetCardProps) => {
 
 interface LocalSnippetCardProps {
   title: string;
-  description: string;
+  description: string | null;
   language: string;
   code: string;
 }

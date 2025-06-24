@@ -1,11 +1,9 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { Prettify, Snippet, Uuid } from '../../types/types';
+import type { LocalSnippet, Prettify, Uuid } from '../../types/types';
 
 interface Folder {
   name: string;
-  items: Array<
-    { kind: 'remote'; snippetId: Uuid } | Prettify<{ kind: 'local' } & Omit<Snippet, 'id' | 'tags' | 'stars'>>
-  >;
+  items: Array<{ kind: 'remote'; snippetId: Uuid } | Prettify<LocalSnippet>>;
 }
 
 type FolderState = Folder[];
