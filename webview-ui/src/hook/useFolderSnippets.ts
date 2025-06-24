@@ -1,0 +1,56 @@
+import React from 'react';
+import { axiosInstance } from '../api';
+import { useAppSelector } from '../app/hooks';
+import { useParams } from '../ContextRouter/utilities/useParams';
+import type { Prettify, Snippet } from '../types/types';
+
+export function useFolderSnippets(titleQuery: string, selectedLanguage: string) {
+  const folderId = Number(useParams().folderId);
+  const folderData = useAppSelector((s) => s.folders[folderId]);
+
+  // split refs
+  const itemsWithIdx = React.useMemo(() => folderData.items.map((snip, idx) => ({ ...snip, idx })), [folderData.items]);
+  const remoteRefs = React.useMemo(() => itemsWithIdx.filter((i) => i.kind === 'remote'), [itemsWithIdx]);
+  const local = React.useMemo(() => itemsWithIdx.filter((i) => i.kind === 'local'), [itemsWithIdx]);
+
+  // fetch remote details
+  const [remote, setRemote] = React.useState<Prettify<Snippet & { idx: number }>[]>([]);
+  const fetchRemote = React.useCallback(async () => {
+    const ids = remoteRefs.map((r) => r.snippetId).join(',');
+    const res = await axiosInstance.get<Snippet[]>(`/public/snippets/batch?ids=${ids}`);
+    const merged = res.data
+      .map((s) => {
+        const ref = remoteRefs.find((r) => r.snippetId === s.id);
+        return ref ? { ...s, idx: ref.idx } : null;
+      })
+      .filter(Boolean) as Prettify<Snippet & { idx: number }>[];
+    setRemote(merged);
+  }, [remoteRefs]);
+
+  React.useEffect(() => {
+    fetchRemote().catch(console.error);
+  }, [fetchRemote]);
+
+  // filter fn
+  const matches = React.useCallback(
+    ({ title, language }: { title: string; language: string }) => {
+      const okTitle = !titleQuery || title.toLowerCase().includes(titleQuery.toLowerCase());
+      const okLang =
+        !selectedLanguage || selectedLanguage === 'all'
+          ? true
+          : language.toLowerCase() === selectedLanguage.toLowerCase();
+      return okTitle && okLang;
+    },
+    [titleQuery, selectedLanguage]
+  );
+
+  // apply filters
+  const localFiltered = React.useMemo(() => local.filter(matches), [local, matches]);
+  const remoteFiltered = React.useMemo(() => remote.filter(matches), [remote, matches]);
+
+  return {
+    isEmpty: folderData.items.length === 0,
+    hasResults: localFiltered.length + remoteFiltered.length > 0,
+    snippets: [...localFiltered, ...remoteFiltered].sort((a, b) => a.idx - b.idx),
+  };
+}

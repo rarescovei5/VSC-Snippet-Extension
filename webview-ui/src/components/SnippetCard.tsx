@@ -23,7 +23,7 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { useAppSelector } from '../app/hooks';
 import type { Uuid } from '../types/types';
-import { SelectionContext } from '../pages/SnippetsContainer';
+import { SelectionContext } from './SelectionProvider';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   c: SiC,

@@ -13,3 +13,4 @@
 
     - I feel like the way I am setting the image that gets displayed when dragging snippets is braindead
     - Join all of the different snippet cards into one component
+    - Make use of axios request return codes to eliminate flickering ui

@@ -1,86 +1,23 @@
 import React from 'react';
-import type { Snippet, Uuid } from '../types/types';
-import { axiosInstance } from '../api';
 import { useAppSelector } from '../app/hooks';
 import { gridStyles, QueryContext } from './SnippetsLayout';
 import { SnippetCard } from '../components/SnippetCard';
 import { VscLoading, VscSearchStop } from 'react-icons/vsc';
-
-interface SelectedContextType {
-  selectedSnippetIds: Set<Uuid>;
-  setSelectedSnippetIds: React.Dispatch<React.SetStateAction<Set<Uuid>>>;
-}
-const initialSelectionContext: SelectedContextType = {
-  selectedSnippetIds: new Set(),
-  setSelectedSnippetIds: () => {},
-};
-export const SelectionContext = React.createContext<SelectedContextType>(initialSelectionContext);
+import SelectionProvider from '../components/SelectionProvider';
+import useDiscoverySnippets from '../hook/useDiscoverySnippets';
 
 const SnippetsContainer = () => {
   const { selectedLanguage, titleQuery } = React.useContext(QueryContext);
-
   const pageSize = useAppSelector((state) => state.settings.apiConfig.pageSize);
 
-  const [pages, setPages] = React.useState<Snippet[][]>([]);
-
-  const [currentPage, setCurrentPage] = React.useState(0);
-  const [nextPage, setNextPage] = React.useState(1);
-  const [totalPages, setTotalPages] = React.useState(1);
-
-  const debounceRef = React.useRef<number | null>(null);
-  const [isPending, startTransition] = React.useTransition();
-
-  const fetchPage = React.useCallback(
-    (page: number, replace: boolean) => async () => {
-      try {
-        const queryParams = new URLSearchParams();
-        if (selectedLanguage) queryParams.append('language', selectedLanguage);
-        queryParams.append('title', titleQuery);
-        queryParams.append('page', String(page));
-        queryParams.append('limit', String(pageSize));
-
-        const res = await axiosInstance.get(`/public/snippets?${queryParams.toString()}`);
-        const data = res.data;
-
-        setCurrentPage(data.current_page);
-        setTotalPages(data.total_pages);
-
-        setPages((old) => (replace ? [data.records] : [...old, data.records]));
-      } catch (error) {
-        console.error('Error fetching snippets', error);
-      }
-    },
-    [selectedLanguage, titleQuery, pageSize]
+  const { pages, currentPage, totalPages, isPending, loadNext } = useDiscoverySnippets(
+    titleQuery,
+    selectedLanguage,
+    pageSize
   );
 
-  React.useEffect(() => {
-    setCurrentPage(0);
-    setNextPage(1);
-    setTotalPages(1);
-  }, [titleQuery, selectedLanguage]);
-
-  React.useEffect(() => {
-    // Initial Load
-    if (nextPage === 1) {
-      debounceRef.current = window.setTimeout(() => {
-        startTransition(fetchPage(1, true));
-      }, 500);
-      return () => {
-        if (debounceRef.current) window.clearTimeout(debounceRef.current);
-      };
-    }
-
-    // Infinite scroll
-    if (nextPage > 1) {
-      startTransition(fetchPage(nextPage, false));
-    }
-  }, [nextPage, fetchPage]);
-
-  const [selectedSnippetIds, setSelectedSnippetIds] = React.useState<Set<Uuid>>(() => new Set());
-  const value = React.useMemo(() => ({ selectedSnippetIds, setSelectedSnippetIds }), [selectedSnippetIds]);
-
   return (
-    <SelectionContext value={value}>
+    <SelectionProvider>
       {/* Snippets  */}
       <div
         style={gridStyles}
@@ -88,9 +25,8 @@ const SnippetsContainer = () => {
         onScroll={(e) => {
           const target = e.target as HTMLDivElement;
           const isNearBottom = target.scrollTop >= target.scrollHeight - target.clientHeight - 25;
-
-          if (isNearBottom && currentPage < totalPages) {
-            setNextPage(currentPage + 1);
+          if (isNearBottom) {
+            loadNext();
           }
         }}
       >
@@ -133,7 +69,7 @@ const SnippetsContainer = () => {
           <p className="text-text-muted mt-1 text-sm">Try adjusting your filters</p>
         </div>
       )}
-    </SelectionContext>
+    </SelectionProvider>
   );
 };
 
