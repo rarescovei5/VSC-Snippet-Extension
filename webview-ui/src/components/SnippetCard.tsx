@@ -298,25 +298,90 @@ export const RemoteSnippetCard = (props: RemoteSnippetCardProps) => {
   );
 };
 
-interface LocalSnippetCardProps {
+type LocalSnippetCardProps = {
   idx: number;
   title: string;
   description: string | null;
   language: string;
   code: string;
-}
+  editSnippet: () => void;
+} & React.HTMLAttributes<HTMLDivElement>;
+
 export const LocalSnippetCard = (props: LocalSnippetCardProps) => {
   const { showLineNumbers } = useAppSelector((state) => state.settings.appearance);
 
   const LangIcon = iconMap[props.language.toLowerCase()] || LuFileCode;
 
+  const selectionCtx = React.useContext(SelectionContext);
+  const isSelected = selectionCtx.selected.has(props.idx);
+
+  const folderId = Number(useParams().folderId);
+  const folderData = useAppSelector((s) => s.folders[folderId]);
+
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+    const allIdx = Array.from(selectionCtx.selected) as number[];
+    const total = allIdx.length;
+
+    const host = document.getElementById('drag-preview-container')!;
+    host.querySelector('span')!.innerText = `${total}`;
+
+    e.dataTransfer.setDragImage(host, 5, 5);
+
+    e.dataTransfer.setData('application/x-folder-snippets', JSON.stringify(allIdx.map((idx) => folderData.items[idx])));
+    e.dataTransfer.setData('application/x-deleted-snippets', JSON.stringify(allIdx));
+  };
+  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    selectionCtx.setSelected(new Set());
+  };
+
   return (
-    <div className="bg-card p-3 flex flex-col justify-between gap-4 rounded-sm border border-border">
+    <div
+      style={props.style}
+      onClick={(e) => {
+        if (!e.shiftKey) return;
+        selectionCtx.setSelected((prev) => {
+          const newSet = new Set(prev);
+          if (!newSet.has(props.idx)) {
+            newSet.add(props.idx);
+          } else {
+            newSet.delete(props.idx);
+          }
+          return newSet;
+        });
+      }}
+      draggable={isSelected}
+      onDragStart={isSelected ? handleDragStart : () => {}}
+      onDragEnd={isSelected ? handleDragEnd : () => {}}
+      className={`group bg-card p-3 flex flex-col justify-between gap-4 rounded-sm border border-border ring ${
+        isSelected ? 'ring-text' : 'ring-transparent'
+      }`}
+    >
       {/* Header  */}
       <div className="flex flex-col !text-text gap-2">
-        <div className="flex items-center gap-2">
-          <LangIcon />
-          <h3 className="text-base">{props.title}</h3>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <LangIcon />
+            <h3 className="text-base">{props.title}</h3>
+          </div>
+          <div
+            className={`rounded-sm items-center justify-center border cursor-pointer border-text/50 w-4 h-4 ${
+              isSelected ? 'flex' : 'hidden group-hover:flex'
+            }`}
+            onClick={() => {
+              selectionCtx.setSelected((prev) => {
+                const newSet = new Set(prev);
+                if (!newSet.has(props.idx)) {
+                  newSet.add(props.idx);
+                } else {
+                  newSet.delete(props.idx);
+                }
+                return newSet;
+              });
+            }}
+          >
+            {isSelected && <div className="bg-text/50 w-3 h-3 rounded-xs" />}
+          </div>
         </div>
         <p className="!text-text">{props.description}</p>
       </div>
@@ -340,7 +405,7 @@ export const LocalSnippetCard = (props: LocalSnippetCardProps) => {
       </SyntaxHighlighter>
 
       {/* Footer  */}
-      <div className="flex !text-text">
+      <div className="flex !text-text gap-3">
         <button
           onClick={() => {
             navigator.clipboard.writeText(props.code);
@@ -348,6 +413,14 @@ export const LocalSnippetCard = (props: LocalSnippetCardProps) => {
           className="px-3 py-1 border border-border rounded-sm cursor-pointer"
         >
           Copy
+        </button>
+        <button
+          onClick={() => {
+            props.editSnippet();
+          }}
+          className="px-3 py-1 border border-border rounded-sm cursor-pointer"
+        >
+          Edit
         </button>
       </div>
     </div>

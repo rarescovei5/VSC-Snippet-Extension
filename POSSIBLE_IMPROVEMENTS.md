@@ -2,7 +2,9 @@
 
     - If "ESC" is pressed, deselect all snippets;
     - Make snippet grid navigateable with only keyboard;
-    - When a snippet is in focus and "SPACE" or "ENTER" is pressed, toggle the selection for the snippet.
+    - When a snippet is in focus and "SPACE" or "ENTER" is pressed, toggle the selection for the snippet;
+    - Add more things that indicate an interaction;
+    - Add tooltips (Make a tooltip component and reuse it).
 
 #### Optional
 

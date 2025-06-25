@@ -2,13 +2,34 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { LocalSnippet, Prettify, Uuid } from '../../types/types';
 
 export type FolderSnippets = Array<{ kind: 'remote'; snippetId: Uuid } | Prettify<LocalSnippet>>;
-interface Folder {
+export interface Folder {
   name: string;
   items: FolderSnippets;
 }
 type FolderState = Folder[];
 
 const initialState: FolderState = JSON.parse(localStorage.getItem('code-snippets/folders') || '[]');
+
+export const languageOptions = new Set([
+  'c',
+  'cpp',
+  'csharp',
+  'css',
+  'go',
+  'java',
+  'javascript',
+  'json',
+  'kotlin',
+  'lua',
+  'php',
+  'python',
+  'ruby',
+  'rust',
+  'sql',
+  'swift',
+  'typescript',
+  'xml',
+]);
 
 const foldersSlice = createSlice({
   name: 'folders',
@@ -38,15 +59,17 @@ const foldersSlice = createSlice({
 
       snippets.forEach((snippet) => {
         const exists = folder.items.some(
-          (item) =>
-            snippet.kind !== item.kind ||
-            (snippet.kind === 'remote' && item.kind === 'remote' && item.snippetId === snippet.snippetId) ||
-            (snippet.kind === 'local' && item.kind === 'local' && item.code === snippet.code)
+          (item) => item.kind === 'remote' && snippet.kind === 'remote' && item.snippetId === snippet.snippetId
         );
         if (!exists) {
           folder.items.push(snippet);
         }
       });
+    },
+    setLocalSnippet(state, action: PayloadAction<{ folderIdx: number; snippetIdx: number; newSnippet: LocalSnippet }>) {
+      const { folderIdx, snippetIdx, newSnippet } = action.payload;
+      if (snippetIdx >= state[folderIdx].items.length || state[folderIdx].items[snippetIdx].kind !== 'local') return;
+      state[folderIdx].items[snippetIdx] = newSnippet;
     },
     deleteSnippets(state, action: PayloadAction<{ folderIdx: number; snippetIdxs: number[] }>) {
       const { folderIdx, snippetIdxs } = action.payload;
@@ -59,5 +82,6 @@ const foldersSlice = createSlice({
   },
 });
 
-export const { addFolder, deleteFolder, addSnippets, deleteSnippets, setFolderName } = foldersSlice.actions;
+export const { addFolder, deleteFolder, addSnippets, deleteSnippets, setLocalSnippet, setFolderName } =
+  foldersSlice.actions;
 export default foldersSlice.reducer;

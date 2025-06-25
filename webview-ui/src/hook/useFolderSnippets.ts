@@ -1,13 +1,9 @@
 import React from 'react';
 import { axiosInstance } from '../api';
-import { useAppSelector } from '../app/hooks';
-import { useParams } from '../ContextRouter/utilities/useParams';
 import type { Prettify, RemoteSnippet } from '../types/types';
+import type { Folder } from '../app/folders/foldersSlice';
 
-export function useFolderSnippets(titleQuery: string, selectedLanguage: string) {
-  const folderId = Number(useParams().folderId);
-  const folderData = useAppSelector((s) => s.folders[folderId]);
-
+export function useFolderSnippets(titleQuery: string, selectedLanguage: string, folderData: Folder) {
   // split refs
   const itemsWithIdx = React.useMemo(() => folderData.items.map((snip, idx) => ({ ...snip, idx })), [folderData.items]);
   const remoteRefs = React.useMemo(() => itemsWithIdx.filter((i) => i.kind === 'remote'), [itemsWithIdx]);

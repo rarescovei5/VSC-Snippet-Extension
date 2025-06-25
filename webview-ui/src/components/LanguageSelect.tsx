@@ -22,21 +22,25 @@ const languageOptions = [
   ['typescript', 'TypeScript'],
   ['xml', 'XML'],
 ];
+
 interface LanguageSelectProps {
   language: string;
   setLanguage: React.Dispatch<React.SetStateAction<string>>;
+  omitOptionAll?: boolean;
 }
-const LanguageSelect = (props: LanguageSelectProps) => {
+const LanguageSelect = ({ language, setLanguage, omitOptionAll = false }: LanguageSelectProps) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
-  const [displayed, setDisplayed] = React.useState('All Languages');
+  const displayed = React.useMemo(() => {
+    const match = languageOptions.find(([value]) => value === language);
+    return match ? match[1] : 'Unknown';
+  }, [language]);
 
   const handleClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    // look for the nearest child DIV that carries your data‑value
     const el = (e.target as HTMLElement).closest<HTMLDivElement>('[data-value]');
     if (!el) return;
-    props.setLanguage(el.dataset.value!);
-    setDisplayed((e.target as HTMLElement).innerText);
+    setLanguage(el.dataset.value!);
+
     setIsOpen(false);
   };
 
@@ -50,12 +54,12 @@ const LanguageSelect = (props: LanguageSelectProps) => {
       </button>
       {isOpen && (
         <div className="z-10 absolute w-full right-0 top-[110%] bg-card border border-border rounded-sm flex flex-col">
-          {languageOptions.map(([value, label]) => (
+          {languageOptions.slice(omitOptionAll ? 1 : 0).map(([value, label]) => (
             <div
               onClick={handleClick}
               key={value || 'all'}
               data-value={value}
-              className={`cursor-pointer px-3 py-1 ${props.language === value ? 'bg-text/20' : 'hover:bg-text/10'}`}
+              className={`cursor-pointer px-3 py-1 ${language === value ? 'bg-text/20' : 'hover:bg-text/10'}`}
             >
               {label}
             </div>

@@ -93,7 +93,7 @@ const AppLayout = () => {
               >
                 <VscFolder />
                 <span
-                  className="outline-none"
+                  className="outline-none flex-1"
                   //Edit Name Logic
                   onDoubleClick={(e) => {
                     setActiveFolderEditIdx(idx);
