@@ -6,7 +6,7 @@ export interface Folder {
   name: string;
   items: FolderSnippets;
 }
-type FolderState = Folder[];
+export type FolderState = Folder[];
 
 const initialState: FolderState = JSON.parse(localStorage.getItem('code-snippets/folders') || '[]');
 
@@ -35,6 +35,11 @@ const foldersSlice = createSlice({
   name: 'folders',
   initialState,
   reducers: {
+    initFolders(state, action: PayloadAction<{ folders: Folder[] }>) {
+      // This will only get called if it's ran in VSC
+      // Otherwise the localStorage version will remain
+      state = action.payload.folders;
+    },
     addFolder(state, action: PayloadAction<{ name: string }>) {
       const { name } = action.payload;
       state.push({ name, items: [] });
@@ -82,6 +87,7 @@ const foldersSlice = createSlice({
   },
 });
 
-export const { addFolder, deleteFolder, addSnippets, deleteSnippets, setLocalSnippet, setFolderName } =
+export const { initFolders, addFolder, deleteFolder, addSnippets, deleteSnippets, setLocalSnippet, setFolderName } =
   foldersSlice.actions;
 export default foldersSlice.reducer;
+export const foldersActionTypes = new Set(Object.values(foldersSlice.actions).map((ac) => ac.type));

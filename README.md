@@ -1,71 +1,34 @@
-# code-snippets README
+# 🚀 VSCode Snippet Manager
 
-This is the README for your extension "code-snippets". After writing up a brief description, we recommend including the following sections.
+A powerful yet simple snippet manager for Visual Studio Code that helps you organize and access your code snippets with ease. Built with a modern React-based interface, it brings a fresh experience to managing your code snippets directly within VSCode.
 
-## Features
+![Snippet Manager Preview](images/snippet-manager-preview.png)
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+## ✨ Features
 
-For example if there is an image subfolder under your extension project workspace:
+- **Organize with Folders**: Group your snippets into custom folders for better organization
+- **Beautiful Syntax Highlighting**: Code previews with proper syntax highlighting
+- **Quick Search**: Find snippets instantly with the powerful search functionality
+- **Responsive Design**: Works great in both panel and side bar views
+- **VSCode Integration**: Seamlessly integrated with VSCode's theming and UI
+- **Keyboard Shortcuts**: Quick access to all features without touching the mouse
 
-\!\[feature X\]\(images/feature-x.png\)
+## 🛠️ Getting Started
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+1. Install the extension from the VSCode Marketplace
+2. Open the command palette (`Ctrl+Shift+P` or `Cmd+Shift+P`)
+3. Search for and select "Snippet Manager: Open"
+4. Start organizing your snippets!
 
-## Requirements
+## 🎨 Customization
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+The extension respects your VSCode theme and provides a familiar interface that matches your editor's look and feel. All your snippets are stored in your VSCode Global Storage for easy access and sync.
 
-## Extension Settings
+## 🤝 Contributing
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+Contributions are welcome! If you find a bug or have a feature request, please open an issue. For code contributions, fork the repository and submit a pull request. (Github Repo)[https://github.com/rarescovei5/VSC-Snippet-Extension]
 
-For example:
+## 📝 License
 
-This extension contributes the following settings:
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**

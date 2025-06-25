@@ -3,7 +3,6 @@ import { Link, Outlet } from '../ContextRouter';
 import { useRouter } from '../ContextRouter/utilities/useRouter';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { addFolder, addSnippets, deleteFolder, setFolderName, type FolderSnippets } from '../app/folders/foldersSlice';
-import type { LocalSnippet, Prettify, Uuid } from '../types/types';
 import React from 'react';
 import { useModal } from '../components/ModalProvider';
 

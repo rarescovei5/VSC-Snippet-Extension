@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 
 // ---------------------- Extension Logic ----------------------
 export function activate(context: vscode.ExtensionContext) {
+  WebviewPanel.globalState = context.globalState;
   /**
    * Create a button to open the webview for the extension
    */
@@ -21,6 +22,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('code-snippets.refresh', () => {
       WebviewPanel.currentPanel?.dispose();
       WebviewPanel.currentPanel = undefined;
+      WebviewPanel.render(context.extensionUri);
     })
   );
 
@@ -30,6 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
 //  ------------------------- Webview --------------------------
 export class WebviewPanel {
   public static currentPanel: WebviewPanel | undefined;
+  public static globalState: vscode.Memento;
   private readonly _panel: vscode.WebviewPanel;
   private _disposables: vscode.Disposable[] = [];
 
@@ -48,6 +51,18 @@ export class WebviewPanel {
 
     // Set the HTML content for the webview panel
     this._panel.webview.html = this._getWebviewContent(this._panel.webview, extensionUri);
+
+    const persistedFolders = WebviewPanel.globalState.get('code-snippets/folders', []);
+    const persistedSettings = WebviewPanel.globalState.get('code-snippets/settings', []);
+
+    this._panel.webview.postMessage({
+      type: 'INIT_FOLDERS',
+      folders: persistedFolders,
+    });
+    this._panel.webview.postMessage({
+      type: 'INIT_SETTINGS',
+      settings: persistedSettings,
+    });
 
     // Set an event listener to listen for messages passed from the webview context
     this._setWebviewMessageListener(this._panel.webview);
@@ -178,15 +193,13 @@ export class WebviewPanel {
     webview.onDidReceiveMessage(
       (message: any) => {
         const command = message.command;
-        const text = message.text;
 
         switch (command) {
-          case 'hello':
-            // Code that should run in response to the hello message command
-            vscode.window.showInformationMessage(text);
+          case 'persistState':
+            // message.folders and message.settings come from the WebView
+            WebviewPanel.globalState.update('code-snippets/folders', message.folders);
+            WebviewPanel.globalState.update('code-snippets/settings', message.settings);
             return;
-          // Add more switch case statements here as more webview message commands
-          // are created within the webview context (i.e. inside media/main.js)
         }
       },
       undefined,

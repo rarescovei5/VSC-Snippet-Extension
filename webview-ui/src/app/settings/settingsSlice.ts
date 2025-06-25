@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-interface settingsSliceType {
+export interface SettingsState {
   apiConfig: {
     pageSize: number;
   };
@@ -10,7 +10,7 @@ interface settingsSliceType {
 }
 
 const storedSettings = localStorage.getItem('code-snippets/settings');
-const initialState: settingsSliceType = storedSettings
+const initialState: SettingsState = storedSettings
   ? JSON.parse(storedSettings)
   : {
       apiConfig: {
@@ -25,6 +25,9 @@ const settingsSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
+    initSettings(state, action: PayloadAction<{ settings: SettingsState }>) {
+      state = action.payload.settings;
+    },
     setPageSize(state, action: PayloadAction<{ newPageSize: number }>) {
       const { newPageSize } = action.payload;
       if (newPageSize < 10) return;
@@ -37,5 +40,6 @@ const settingsSlice = createSlice({
   },
 });
 
-export const { setPageSize, setShowLineNumbers } = settingsSlice.actions;
+export const { initSettings, setPageSize, setShowLineNumbers } = settingsSlice.actions;
 export default settingsSlice.reducer;
+export const settingsActionTypes = new Set(Object.values(settingsSlice.actions).map((ac) => ac.type));
