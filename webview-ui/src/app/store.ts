@@ -13,8 +13,7 @@ const persistMiddleware: Middleware<{}, RootState> = (storeAPI) => (next) => (ac
 
   const state = storeAPI.getState();
 
-  if (action.type === 'folders/initFolders' || action.type === 'settings/initSettings') {
-  } else if (foldersActionTypes.has(action.type)) {
+  if (foldersActionTypes.has(action.type)) {
     if (typeof (vscodeApi as any).postMessage === 'function') {
       (vscodeApi as any).postMessage({
         type: 'persistFolders',

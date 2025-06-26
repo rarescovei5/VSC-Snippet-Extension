@@ -43,4 +43,8 @@ const settingsSlice = createSlice({
 
 export const { initSettings, setPageSize, setShowLineNumbers } = settingsSlice.actions;
 export default settingsSlice.reducer;
-export const settingsActionTypes = new Set(Object.values(settingsSlice.actions).map((ac) => ac.type));
+export const settingsActionTypes = new Set(
+  Object.values(settingsSlice.actions)
+    .filter((ac) => ac.type !== 'settings/initSettings')
+    .map((ac) => ac.type)
+);

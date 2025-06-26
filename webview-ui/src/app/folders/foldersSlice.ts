@@ -3,6 +3,7 @@ import type { LocalSnippet, Prettify, Uuid } from '../../types/types';
 
 export type FolderSnippets = Array<{ kind: 'remote'; snippetId: Uuid } | Prettify<LocalSnippet>>;
 export interface Folder {
+  id: Uuid;
   name: string;
   items: FolderSnippets;
 }
@@ -41,7 +42,19 @@ const foldersSlice = createSlice({
     },
     addFolder(state, action: PayloadAction<{ name: string }>) {
       const { name } = action.payload;
-      state.push({ name, items: [] });
+      state.push({ id: crypto.randomUUID(), name, items: [] });
+    },
+    importFolders(state, action: PayloadAction<{ folders: Folder[] }>) {
+      const incoming = action.payload.folders;
+
+      incoming.forEach((incomingFolder) => {
+        const existingIdx = state.findIndex((f) => f.id === incomingFolder.id);
+        if (existingIdx !== -1) {
+          state[existingIdx] = incomingFolder;
+        } else {
+          state.push(incomingFolder);
+        }
+      });
     },
     deleteFolder(state, action: PayloadAction<{ folderIdx: number }>) {
       const { folderIdx } = action.payload;
@@ -86,7 +99,19 @@ const foldersSlice = createSlice({
   },
 });
 
-export const { initFolders, addFolder, deleteFolder, addSnippets, deleteSnippets, setLocalSnippet, setFolderName } =
-  foldersSlice.actions;
+export const {
+  initFolders,
+  importFolders,
+  addFolder,
+  deleteFolder,
+  addSnippets,
+  deleteSnippets,
+  setLocalSnippet,
+  setFolderName,
+} = foldersSlice.actions;
 export default foldersSlice.reducer;
-export const foldersActionTypes = new Set(Object.values(foldersSlice.actions).map((ac) => ac.type));
+export const foldersActionTypes = new Set(
+  Object.values(foldersSlice.actions)
+    .filter((ac) => ac.type !== 'folders/initFolders')
+    .map((ac) => ac.type)
+);

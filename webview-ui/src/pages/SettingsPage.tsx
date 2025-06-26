@@ -2,6 +2,7 @@ import React from 'react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { VscError } from 'react-icons/vsc';
 import * as settingsActions from '../app/settings/settingsSlice';
+import { importFolders } from '../app/folders/foldersSlice';
 
 /**
  * @param pageSize number
@@ -14,6 +15,8 @@ function parsePageSize(pageSize: string) {
 
 const SettingsPage = () => {
   const dispatch = useAppDispatch();
+
+  const folders = useAppSelector((state) => state.folders);
 
   const { pageSize: settings_pageSize } = useAppSelector((state) => state.settings.apiConfig);
   const { showLineNumbers: settings_showLineNumbers } = useAppSelector((state) => state.settings.appearance);
@@ -78,7 +81,33 @@ const SettingsPage = () => {
       </div>
 
       <h3 className="text-xl font-medium mb-4">Folders</h3>
-      <div className="flex items-center mb-6"></div>
+      <div className="flex flex-col items-start mb-4 space-y-2">
+        <label className="text-lg font-medium" htmlFor="page-size">
+          Export Folders
+        </label>
+        <p className="text-text-muted text-sm">Copies to your clipboard the JSON representation of your folders.</p>
+        <button
+          className="px-3 py-1 border border-border rounded-sm cursor-pointer hover:bg-border/10 active:bg-border/50"
+          onClick={() => navigator.clipboard.writeText(JSON.stringify(folders))}
+        >
+          Export
+        </button>
+      </div>
+      <div className="flex flex-col items-start mb-6 space-y-2">
+        <label className="text-lg font-medium" htmlFor="page-size">
+          Import Folders
+        </label>
+        <p className="text-text-muted text-sm"> Paste a JSON string to import folders into your workspace.</p>
+        <button
+          onClick={async () => {
+            const json = await navigator.clipboard.readText();
+            dispatch(importFolders({ folders: JSON.parse(json) }));
+          }}
+          className="px-3 py-1 border border-border rounded-sm cursor-pointer hover:bg-border/10 active:bg-border/50"
+        >
+          Import
+        </button>
+      </div>
     </div>
   );
 };
