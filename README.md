@@ -1,118 +1,34 @@
-# 📚 Snippet Manager for VS Code
+# 🚀 VSCode Snippet Manager
 
-A powerful and intuitive snippet manager inside your VS Code extension panel. Organize, search, and browse code snippets with ease using folders, tags, and multiple views.
+A powerful yet simple snippet manager for Visual Studio Code that helps you organize and access your code snippets with ease. Built with a modern React-based interface, it brings a fresh experience to managing your code snippets directly within VSCode.
+
+![Snippet Manager Preview](images/snippet-manager-preview.png)
 
 ## ✨ Features
 
-- 📁 **Folder Management**  
-  Create, rename, delete, import and export folders to organize your snippets.
+- **Organize with Folders**: Group your snippets into custom folders for better organization
+- **Beautiful Syntax Highlighting**: Code previews with proper syntax highlighting
+- **Quick Search**: Find snippets instantly with the powerful search functionality
+- **Responsive Design**: Works great in both panel and side bar views
+- **VSCode Integration**: Seamlessly integrated with VSCode's theming and UI
+- **Keyboard Shortcuts**: Quick access to all features without touching the mouse
 
-- 🔎 **Search and Filter**  
-  Filter snippets by title and language, both globally and within folders.
+## 🛠️ Getting Started
 
-- 🌐 **Infinite Scroll**  
-  Seamlessly load more snippets as you scroll.
+1. Install the extension from the VSCode Marketplace
+2. Open the command palette (`Ctrl+Shift+P` or `Cmd+Shift+P`)
+3. Search for and select "Snippet Manager: Open"
+4. Start organizing your snippets!
 
-- 🗃️ **Grid & List Views**  
-  Toggle between a compact grid or detailed list display.
+## 🎨 Customization
 
-- 🧩 **Drag and Drop**  
-  Drag snippets into folders directly for quick organization.
+The extension respects your VSCode theme and provides a familiar interface that matches your editor's look and feel. All your snippets are stored in your VSCode Global Storage for easy access and sync.
 
-- ⚙️ **Settings Page**  
-  Switch to the settings tab for extra features.
+## 🤝 Contributing
 
-- 💾 **Persistence**  
-  All folder data is saved locally using `localStorage`.
+Contributions are welcome! If you find a bug or have a feature request, please open an issue. For code contributions, fork the repository and submit a pull request. (Github Repo)[https://github.com/rarescovei5/VSC-Snippet-Extension]
 
-## 🧪 Getting Started
+## 📝 License
 
-1. Clone the repository:
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-   ```bash
-   git clone https://github.com/your-username/vscode-snippet-manager.git
-   cd vscode-snippet-manager
-   ```
-
-2. Install dependencies and open in VS Code:
-
-   ```bash
-   npm install
-   code .
-   ```
-
-3. Press `F5` to launch the extension in a new VS Code window.
-
-## 🧠 Architecture Overview
-
-The extension follows a modular component-based architecture with an observer pattern for state management:
-
-### 📂 File Structure
-
-- **CSS**: Modular approach with separation of concerns
-
-  - `base.css`: Core styling elements and variables
-  - `components.css`: Individual component styles
-  - `layout.css`: Layout and positioning rules
-  - `utilities.css`: Helper classes
-  - `main.css`: Entry point that imports all styles
-
-- **JavaScript**: ES modules pattern
-
-  - `app.js`: Main application entry point
-  - **Services**:
-    - `state.service.js`: Central state management with observer pattern
-    - `api.service.js`: API communication layer
-  - **Components**:
-    - `content.js`: Path handling
-    - `snippets.js`: Snippet rendering and interactions
-    - `folders.js`: Folder management
-    - `search.js`: Search functionality
-    - `settings.js`: Settings panel operations
-  - **Utils**:
-    - `dom.js`: DOM manipulation utilities
-    - `state.js`: stateService wrapper functions
-
-- **Assets**:
-  - `icons/`: SVG and other icon assets
-  - `vendor/`: Third-party libraries
-
-### 🔄 Observer Pattern Implementation
-
-- The `state.service.js` acts as a central store that components observe
-- Components subscribe to state changes and update accordingly
-- This creates a unidirectional data flow:
-
-  1. User interactions trigger state changes
-  2. State service notifies all subscribers
-  3. Components re-render based on new state
-
-- Uses VS Code Webview API to interact with the frontend UI
-
-## 📁 Folder Behavior
-
-- Each folder has:
-  - A custom name (editable)
-  - A list of snippet IDs
-  - A delete button
-- Snippets are added/removed via drag-and-drop
-- Folder changes persist using `localStorage`
-
-## 📤 API Endpoints (Backend Required)
-#### See the logic behind these paths: [Principium-API](https://github.com/rarescovei5/Principium-API/blob/main/src/routes/snippetRouter.ts)
-
-- `GET /api/v1/snippets/discover?language=exampleLanguage&title=exampleTitle&page=1&limit=10`  
-  Returns paginated snippets for the discover view.
-
-- `POST /api/v1/snippets/ids`  
-  Accepts an array of IDs to fetch specific snippets (used in folders).
-
-
-## 🛠️ Technologies
-
-- [TypeScript](https://www.typescriptlang.org)
-- [VS Code Extensions API](https://code.visualstudio.com/api)
-
-## 🧾 License
-
-MIT © Principium Studios

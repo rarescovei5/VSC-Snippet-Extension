@@ -1,197 +1,230 @@
-// Load .env from root
-import * as dotenv from 'dotenv';
-import * as path from 'path';
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
-
-// VSC Extension
 import * as vscode from 'vscode';
 
 // ---------------------- Extension Logic ----------------------
 export function activate(context: vscode.ExtensionContext) {
+  WebviewPanel.globalState = context.globalState;
   /**
    * Create a button to open the webview for the extension
    */
   const sBarButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 0);
   sBarButton.text = '$(notebook-mimetype) Code Snippets';
-  sBarButton.command = 'principium-snippets.openWebview';
+  sBarButton.command = 'code-snippets.openWebview';
   sBarButton.tooltip = 'Open Code Snippet Manager';
   sBarButton.show();
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('principium-snippets.openWebview', () => {
-      SnippetPanel.createOrShow(context.extensionUri);
+    vscode.commands.registerCommand('code-snippets.openWebview', () => {
+      WebviewPanel.render(context.extensionUri);
     })
   );
+
   context.subscriptions.push(
-    vscode.commands.registerCommand('principium-snippets.refresh', () => {
-      SnippetPanel.kill();
-      SnippetPanel.createOrShow(context.extensionUri);
+    vscode.commands.registerCommand('code-snippets.refresh', () => {
+      WebviewPanel.currentPanel?.dispose();
+      WebviewPanel.currentPanel = undefined;
+      WebviewPanel.render(context.extensionUri);
     })
   );
+
   context.subscriptions.push(sBarButton);
 }
-export function deactivate() {
-  SnippetPanel.kill();
-}
+
 //  ------------------------- Webview --------------------------
-
-class SnippetPanel {
-  public static currentPanel: SnippetPanel | undefined;
-
-  public static readonly viewType = 'snippetManager';
-
+export class WebviewPanel {
+  public static currentPanel: WebviewPanel | undefined;
+  public static globalState: vscode.Memento;
   private readonly _panel: vscode.WebviewPanel;
-  private readonly _extensionUri: vscode.Uri;
   private _disposables: vscode.Disposable[] = [];
 
+  /**
+   * The WebviewPanel class private constructor (called only from the render method).
+   *
+   * @param panel A reference to the webview panel
+   * @param extensionUri The URI of the directory containing the extension
+   */
   private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
     this._panel = panel;
-    this._extensionUri = extensionUri;
 
-    // Set the webview's html content
-    const loadHtml = async () => {
-      this._panel.webview.html = await this._getHtml();
+    // Set an event listener to listen for when the panel is disposed (i.e. when the user closes
+    // the panel or when the panel is closed programmatically)
+    this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+
+    // Set the HTML content for the webview panel
+    this._panel.webview.html = this._getWebviewContent(this._panel.webview, extensionUri);
+
+    const iconPath = {
+      light: vscode.Uri.joinPath(extensionUri, 'webview-ui', 'build', 'code-dark.svg'),
+      dark: vscode.Uri.joinPath(extensionUri, 'webview-ui', 'build', 'code-white.svg'),
     };
-    loadHtml();
 
-    // Send the API Path
-    this._panel.webview.postMessage({
-      type: 'env',
-      data: {
-        API_BASE_URL: process.env.API_BASE_URL || '',
+    this._panel.iconPath = iconPath;
+
+    // Set an event listener to listen for messages passed from the webview context
+    this._setWebviewMessageListener(this._panel.webview);
+
+    const persistedFolders = WebviewPanel.globalState.get('code-snippets/folders', []);
+    const persistedSettings = WebviewPanel.globalState.get('code-snippets/settings', {
+      apiConfig: {
+        pageSize: 10,
+      },
+      appearance: {
+        showLineNumbers: false,
       },
     });
 
-    this._panel.iconPath = vscode.Uri.joinPath(this._extensionUri, 'media', 'assets', 'icons', 'code.svg');
+    this._panel.webview.postMessage({
+      type: 'INIT_FOLDERS',
+      folders: persistedFolders,
+    });
+    this._panel.webview.postMessage({
+      type: 'INIT_SETTINGS',
+      settings: persistedSettings,
+    });
+  }
 
-    // Listen for when the panel is disposed
-    // This happens when the user closes the panel or when the panel is closed programmatically
-    this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
-
-    // Handle messages from the webview
-    this._panel.webview.onDidReceiveMessage(
-      (message) => {
-        switch (message.command) {
-          case 'alert':
-            vscode.window.showErrorMessage(message.text);
-            return;
+  /**
+   * Renders the current webview panel if it exists otherwise a new webview panel
+   * will be created and displayed.
+   *
+   * @param extensionUri The URI of the directory containing the extension.
+   */
+  public static render(extensionUri: vscode.Uri) {
+    if (WebviewPanel.currentPanel) {
+      // If the webview panel already exists reveal it
+      WebviewPanel.currentPanel._panel.reveal(vscode.ViewColumn.One);
+    } else {
+      // If a webview panel does not already exist create and show a new one
+      const panel = vscode.window.createWebviewPanel(
+        // Panel view type
+        'showHelloWorld',
+        // Panel title
+        'Code Snippets',
+        // The editor column the panel should be displayed in
+        vscode.ViewColumn.One,
+        // Extra panel configurations
+        {
+          // Enable JavaScript in the webview
+          enableScripts: true,
+          // Restrict the webview to only load resources from the `out` and `webview-ui/build` directories
+          localResourceRoots: [
+            vscode.Uri.joinPath(extensionUri, 'out'),
+            vscode.Uri.joinPath(extensionUri, 'webview-ui/build'),
+          ],
         }
-      },
-      null,
-      this._disposables
-    );
-  }
+      );
 
-  public static createOrShow(extensionUri: vscode.Uri) {
-    const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
-
-    // If we already have a panel, show it.
-    if (SnippetPanel.currentPanel) {
-      SnippetPanel.currentPanel._panel.reveal(column);
-      return;
-    }
-
-    // Otherwise, create a new panel.
-    const panel = vscode.window.createWebviewPanel(
-      SnippetPanel.viewType,
-      'Code Snippets',
-      column || vscode.ViewColumn.One,
-      getWebviewOptions(extensionUri)
-    );
-
-    SnippetPanel.currentPanel = new SnippetPanel(panel, extensionUri);
-  }
-
-  private async getMedia(webview: vscode.Webview): Promise<string> {
-    const htmlUri = vscode.Uri.joinPath(this._extensionUri, 'media', 'index.html');
-    let html = (await vscode.workspace.fs.readFile(htmlUri)).toString();
-
-    // URI for the main script file
-    const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'js', 'app.js'));
-
-    // URIs for CSS files in the modular structure
-    const baseCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'css', 'base.css'));
-
-    const componentsCssUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, 'media', 'css', 'components.css')
-    );
-
-    const layoutCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'css', 'layout.css'));
-
-    const utilitiesCssUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, 'media', 'css', 'utilities.css')
-    );
-
-    const mainCssUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'css', 'main.css'));
-
-    // Using the existing highlight.js resources
-    const highlightJsUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, 'media', 'assets', 'vendor', 'highlight.min.js')
-    );
-
-    const highlightCssUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, 'media', 'assets', 'vendor', 'atom-one-dark.min.css')
-    );
-
-    // Use a nonce to only allow specific scripts to be run
-    const nonce = getNonce();
-
-    // Replace placeholders in HTML file
-    html = html
-      .replace(/\${webview.cspSource}/g, webview.cspSource)
-      .replace(/\${nonce}/g, nonce)
-      .replace(/\${highlightCssUri}/g, highlightCssUri.toString())
-      .replace(/\${highlightJsUri}/g, highlightJsUri.toString())
-      .replace(/\${scriptUri}/g, scriptUri.toString())
-      .replace(/\${baseCssUri}/g, baseCssUri.toString())
-      .replace(/\${componentsCssUri}/g, componentsCssUri.toString())
-      .replace(/\${layoutCssUri}/g, layoutCssUri.toString())
-      .replace(/\${utilitiesCssUri}/g, utilitiesCssUri.toString())
-      .replace(/\${mainCssUri}/g, mainCssUri.toString());
-
-    return html;
-  }
-
-  private async _getHtml(): Promise<string> {
-    const webview = this._panel.webview;
-
-    try {
-      return this.getMedia(webview);
-    } catch (error) {
-      console.error('Error reading HTML file:', error);
-      return `<h1>Error loading webview</h1>`;
+      WebviewPanel.currentPanel = new WebviewPanel(panel, extensionUri);
     }
   }
 
+  /**
+   * Cleans up and disposes of webview resources when the webview panel is closed.
+   */
   public dispose() {
-    SnippetPanel.currentPanel = undefined;
+    WebviewPanel.currentPanel = undefined;
 
-    // Clean up our resources
+    // Dispose of the current webview panel
     this._panel.dispose();
 
+    // Dispose of all disposables (i.e. commands) for the current webview panel
     while (this._disposables.length) {
-      const x = this._disposables.pop();
-      if (x) {
-        x.dispose();
+      const disposable = this._disposables.pop();
+      if (disposable) {
+        disposable.dispose();
       }
     }
   }
-  public static kill() {
-    SnippetPanel.currentPanel?._panel.webview.postMessage({ type: 'shutdown' });
-    SnippetPanel.currentPanel?.dispose();
-    SnippetPanel.currentPanel = undefined;
+
+  /**
+   * Defines and returns the HTML that should be rendered within the webview panel.
+   *
+   * @remarks This is also the place where references to the React webview build files
+   * are created and inserted into the webview HTML.
+   *
+   * @param webview A reference to the extension webview
+   * @param extensionUri The URI of the directory containing the extension
+   * @returns A template string literal containing the HTML that should be
+   * rendered within the webview panel
+   */
+  private _getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri) {
+    // The CSS file from the React build output
+    const stylesUri = getUri(webview, extensionUri, ['webview-ui', 'build', 'assets', 'index.css']);
+    // The JS file from the React build output
+    const scriptUri = getUri(webview, extensionUri, ['webview-ui', 'build', 'assets', 'index.js']);
+
+    const nonce = getNonce();
+
+    const cspDirectives = [
+      `default-src 'none'`,
+      `style-src ${webview.cspSource}`,
+      `script-src 'nonce-${nonce}'`,
+      `connect-src http://localhost:8080 ${webview.cspSource}`,
+    ];
+    const csp = cspDirectives.join('; ');
+
+    // Tip: Install the es6-string-html VS Code extension to enable code highlighting below
+    return /*html*/ `
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <meta http-equiv="Content-Security-Policy" content="${csp}">
+          <link rel="stylesheet" type="text/css" href="${stylesUri}">
+          <title>Code Snippets</title>
+        </head>
+        <body>
+          <div id="root"></div>
+          <div id="drag-preview-container" class="fixed -left-96 -top-96 z-100">
+            <div class="text-text relative inline-flex justify-center items-center">
+              <svg width="32" height="32" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M10.5702 1.14L13.8502 4.44L14.0002 4.8V14.5L13.5002 15H2.50024L2.00024 14.5V1.5L2.50024 1H10.2202L10.5702 1.14ZM10.0002 5H13.0002L10.0002 2V5ZM3.00024 2V14H13.0002V6H9.50024L9.00024 5.5V2H3.00024ZM11.0002 7H5.00024V8H11.0002V7ZM5.00024 9H11.0002V10H5.00024V9ZM11.0002 11H5.00024V12H11.0002V11Z"
+                  class="fill-text"
+                />
+              </svg>
+              <span
+                class="bg-card border border-border rounded-full flex items-center justify-center w-7 h-7 absolute top-0 right-0 translate-x-1/2 -translate-y-1/2"
+              ></span>
+            </div>
+          </div>
+          <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
+        </body>
+      </html>
+    `;
+  }
+
+  /**
+   * Sets up an event listener to listen for messages passed from the webview context and
+   * executes code based on the message that is recieved.
+   *
+   * @param webview A reference to the extension webview
+   * @param context A reference to the extension context
+   */
+  private _setWebviewMessageListener(webview: vscode.Webview) {
+    webview.onDidReceiveMessage(
+      async (message: any) => {
+        const command = message.type;
+
+        switch (command) {
+          case 'persistFolders':
+            await WebviewPanel.globalState.update('code-snippets/folders', message.folders);
+            return;
+          case 'persistSettings':
+            await WebviewPanel.globalState.update('code-snippets/settings', message.settings);
+
+            return;
+        }
+      },
+      undefined,
+      this._disposables
+    );
   }
 }
-//  -------------------- Utility Functions ---------------------
-function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
-  return {
-    // Enable javascript in the webview
-    enableScripts: true,
 
-    // And restrict the webview to only loading content from our extension's directories
-    localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')],
-  };
-}
+//  -------------------- Utility Functions ---------------------
 function getNonce() {
   let text = '';
   const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -199,4 +232,7 @@ function getNonce() {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
   }
   return text;
+}
+function getUri(webview: vscode.Webview, extensionUri: vscode.Uri, pathList: string[]) {
+  return webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, ...pathList));
 }
