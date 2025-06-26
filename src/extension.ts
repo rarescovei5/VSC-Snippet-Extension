@@ -52,8 +52,18 @@ export class WebviewPanel {
     // Set the HTML content for the webview panel
     this._panel.webview.html = this._getWebviewContent(this._panel.webview, extensionUri);
 
+    // Set an event listener to listen for messages passed from the webview context
+    this._setWebviewMessageListener(this._panel.webview);
+
     const persistedFolders = WebviewPanel.globalState.get('code-snippets/folders', []);
-    const persistedSettings = WebviewPanel.globalState.get('code-snippets/settings', []);
+    const persistedSettings = WebviewPanel.globalState.get('code-snippets/settings', {
+      apiConfig: {
+        pageSize: 10,
+      },
+      appearance: {
+        showLineNumbers: false,
+      },
+    });
 
     this._panel.webview.postMessage({
       type: 'INIT_FOLDERS',
@@ -63,9 +73,6 @@ export class WebviewPanel {
       type: 'INIT_SETTINGS',
       settings: persistedSettings,
     });
-
-    // Set an event listener to listen for messages passed from the webview context
-    this._setWebviewMessageListener(this._panel.webview);
   }
 
   /**
@@ -191,14 +198,16 @@ export class WebviewPanel {
    */
   private _setWebviewMessageListener(webview: vscode.Webview) {
     webview.onDidReceiveMessage(
-      (message: any) => {
-        const command = message.command;
+      async (message: any) => {
+        const command = message.type;
 
         switch (command) {
-          case 'persistState':
-            // message.folders and message.settings come from the WebView
-            WebviewPanel.globalState.update('code-snippets/folders', message.folders);
-            WebviewPanel.globalState.update('code-snippets/settings', message.settings);
+          case 'persistFolders':
+            await WebviewPanel.globalState.update('code-snippets/folders', message.folders);
+            return;
+          case 'persistSettings':
+            await WebviewPanel.globalState.update('code-snippets/settings', message.settings);
+
             return;
         }
       },

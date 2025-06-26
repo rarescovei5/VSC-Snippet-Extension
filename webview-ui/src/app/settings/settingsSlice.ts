@@ -25,8 +25,9 @@ const settingsSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
-    initSettings(state, action: PayloadAction<{ settings: SettingsState }>) {
-      state = action.payload.settings;
+    initSettings(_, action: PayloadAction<{ settings: SettingsState }>) {
+      // This only gets called in VSC
+      return action.payload.settings;
     },
     setPageSize(state, action: PayloadAction<{ newPageSize: number }>) {
       const { newPageSize } = action.payload;

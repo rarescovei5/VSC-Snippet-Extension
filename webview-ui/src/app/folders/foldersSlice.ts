@@ -35,10 +35,9 @@ const foldersSlice = createSlice({
   name: 'folders',
   initialState,
   reducers: {
-    initFolders(state, action: PayloadAction<{ folders: Folder[] }>) {
-      // This will only get called if it's ran in VSC
-      // Otherwise the localStorage version will remain
-      state = action.payload.folders;
+    initFolders(_, action: PayloadAction<{ folders: Folder[] }>) {
+      // This only gets called in VSC
+      return action.payload.folders;
     },
     addFolder(state, action: PayloadAction<{ name: string }>) {
       const { name } = action.payload;

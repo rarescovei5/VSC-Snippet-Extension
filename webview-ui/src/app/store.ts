@@ -11,18 +11,27 @@ const rootReducer = combineReducers({
 const persistMiddleware: Middleware<{}, RootState> = (storeAPI) => (next) => (action: any) => {
   const result = next(action);
 
-  const shouldPersist = foldersActionTypes.has(action.type) || settingsActionTypes.has(action.type);
-
   const state = storeAPI.getState();
-  if (shouldPersist && typeof (vscodeApi as any).postMessage === 'function') {
-    (vscodeApi as any).postMessage({
-      type: 'persistState',
-      folders: state.folders,
-      settings: state.settings,
-    });
-  } else {
-    localStorage.setItem('code-snippets/folders', JSON.stringify(state.folders));
-    localStorage.setItem('code-snippets/settings', JSON.stringify(state.settings));
+
+  if (action.type === 'folders/initFolders' || action.type === 'settings/initSettings') {
+  } else if (foldersActionTypes.has(action.type)) {
+    if (typeof (vscodeApi as any).postMessage === 'function') {
+      (vscodeApi as any).postMessage({
+        type: 'persistFolders',
+        folders: state.folders,
+      });
+    } else {
+      localStorage.setItem('code-snippets/folders', JSON.stringify(state.folders));
+    }
+  } else if (settingsActionTypes.has(action.type)) {
+    if (typeof (vscodeApi as any).postMessage === 'function') {
+      (vscodeApi as any).postMessage({
+        type: 'persistSettings',
+        settings: state.settings,
+      });
+    } else {
+      localStorage.setItem('code-snippets/settings', JSON.stringify(state.settings));
+    }
   }
 
   return result;
