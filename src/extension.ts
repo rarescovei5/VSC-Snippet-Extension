@@ -52,6 +52,13 @@ export class WebviewPanel {
     // Set the HTML content for the webview panel
     this._panel.webview.html = this._getWebviewContent(this._panel.webview, extensionUri);
 
+    const iconPath = {
+      light: vscode.Uri.joinPath(extensionUri, 'webview-ui', 'build', 'code-dark.svg'),
+      dark: vscode.Uri.joinPath(extensionUri, 'webview-ui', 'build', 'code-white.svg'),
+    };
+
+    this._panel.iconPath = iconPath;
+
     // Set an event listener to listen for messages passed from the webview context
     this._setWebviewMessageListener(this._panel.webview);
 
