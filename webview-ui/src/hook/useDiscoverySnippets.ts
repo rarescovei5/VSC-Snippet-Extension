@@ -22,7 +22,7 @@ const useDiscoverySnippets = (titleQuery: string, selectedLanguage: string, page
         current_page: number;
         total_pages: number;
         records: Snippet[];
-      }>(`/public/snippets?${params.toString()}`);
+      }>(`/snippets?${params.toString()}`);
 
       setCurrentPage(res.data.current_page);
       setTotalPages(res.data.total_pages);
