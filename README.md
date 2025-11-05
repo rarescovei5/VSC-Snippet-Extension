@@ -24,7 +24,7 @@ The extension respects your VSCode theme and provides a familiar interface that 
 
 ## 🤝 Contributing
 
-Contributions are welcome! If you find a bug or have a feature request, please open an issue. For code contributions, fork the repository and submit a pull request. (Github Repo)[https://github.com/rarescovei5/VSC-Snippet-Extension]
+Contributions are welcome! If you find a bug or have a feature request, please open an issue. For code contributions, fork the repository and submit a pull request.
 
 ## 📝 License
 
