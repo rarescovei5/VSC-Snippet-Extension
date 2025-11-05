@@ -7,11 +7,9 @@ A powerful yet simple snippet manager for Visual Studio Code that helps you orga
 ## ✨ Features
 
 - **Organize with Folders**: Group your snippets into custom folders for better organization
-- **Beautiful Syntax Highlighting**: Code previews with proper syntax highlighting
 - **Quick Search**: Find snippets instantly with the powerful search functionality
-- **Responsive Design**: Works great in both panel and side bar views
 - **VSCode Integration**: Seamlessly integrated with VSCode's theming and UI
-- **Keyboard Shortcuts**: Quick access to all features without touching the mouse
+- **Easy Copy & Paste**: Copy snippets with one click and paste them directly into your code — streamlining your workflow.
 
 ## 🛠️ Getting Started
 
